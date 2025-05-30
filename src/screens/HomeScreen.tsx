@@ -97,7 +97,7 @@ export default function HomeScreen() {
               style={styles.avatar}
               resizeMode="cover"
             />
-            <Text style={styles.userName}>Tunahan</Text>
+            <Text style={styles.userName}>Şakir</Text>
           </View>
           <TouchableOpacity style={styles.notificationButton}>
             <Ionicons name="notifications-outline" size={24} color="#333" />

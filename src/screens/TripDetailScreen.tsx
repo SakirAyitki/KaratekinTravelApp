@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,8 @@ interface TripDetailScreenProps {
 }
 
 export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const defaultTripData = {
     title: 'Amasra Turu',
     location: 'Amasra, Türkiye',
@@ -33,6 +35,14 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
   };
 
   const trip = tripData || defaultTripData;
+
+  const fullText = "Karadeniz'in incisi Amasra'da unutulmaz bir tatil deneyimi sizi bekliyor. Tarihi dokusu, muhteşem doğası ve eşsiz deniz manzarası ile Amasra, her yaştan ziyaretçi için ideal bir destinasyondır. Tur paketimizde uçak bileti, önerilen otel odaları ve ulaşım dahildir. Amasra Kalesi, Fatih Camii, Bedesten ve tarihi liman gibi önemli turistik noktaları ziyaret edeceksiniz. Ayrıca geleneksel Amasra balığı tatma fırsatı da bulacaksınız. Denize girebileceğiniz, fotoğraf çekebileceğiniz ve unutulmaz anılar biriktireceğiniz harika bir gezi sizi bekliyor.";
+  
+  const shortText = "Karadeniz'in incisi Amasra'da unutulmaz bir tatil deneyimi sizi bekliyor. Tarihi dokusu, muhteşem doğası ve eşsiz deniz manzarası ile Amasra, her yaştan ziyaretçi için ideal bir destinasyondır. Tur paketimizde uçak bileti, önerilen otel odaları ve ulaşım dahildir...";
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -113,9 +123,16 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
           <View style={styles.aboutSection}>
             <Text style={styles.aboutTitle}>Tur Hakkında</Text>
             <Text style={styles.aboutText}>
-              You will get a complete travel package on the beaches. Packages in the form of airline tickets, recommended Hotel rooms, Transportation. Have you ever been on holiday to the Greek ETC...{' '}
-              <Text style={styles.readMoreText}>Read More</Text>
+              {isExpanded ? fullText : shortText}
+              {!isExpanded && (
+                <Text style={styles.readMoreText} onPress={toggleExpanded}> Devamını Oku</Text>
+              )}
             </Text>
+            {isExpanded && (
+              <TouchableOpacity onPress={toggleExpanded} style={styles.showLessContainer}>
+                <Text style={styles.readMoreText}>Daha Az Göster</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Action Buttons */}
@@ -292,6 +309,11 @@ const styles = StyleSheet.create({
   readMoreText: {
     color: '#FF6B35',
     fontWeight: '600',
+    fontSize: 15,
+  },
+  showLessContainer: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
   },
   actionButtons: {
     flexDirection: 'row',

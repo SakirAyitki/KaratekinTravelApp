@@ -91,7 +91,7 @@ export default function EmailVerificationScreen({ onVerify, onBack, email }: Ema
               <Text style={styles.title}>Mail Doğrulama</Text>
               <Text style={styles.subtitle}>
                 Doğrulama kodunu görmek için lütfen{'\n'}
-                <Text style={styles.emailText}>{email || 'tunahankorkmaz@gmail.com'}</Text> adresindeki{'\n'}
+                <Text style={styles.emailText}>{email || 'karatekintravel@gmail.com'}</Text> adresindeki{'\n'}
                 e-postanızı kontrol edin.
               </Text>
             </View>
