@@ -7,11 +7,14 @@ import {
   TouchableOpacity,
   Dimensions,
   StatusBar,
-  Alert,
-  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { signInWithEmail } from '../config/firebase';
+import { Ionicons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -19,259 +22,215 @@ interface LoginScreenProps {
   onNavigateToForgotPassword: () => void;
 }
 
-const { width } = Dimensions.get('window');
-
-export default function LoginScreen({ 
-  onLogin, 
-  onNavigateToRegister, 
-  onNavigateToForgotPassword 
-}: LoginScreenProps) {
+export default function LoginScreen({ onLogin, onNavigateToRegister, onNavigateToForgotPassword }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
-      return;
-    }
-
-    setLoading(true);
-    const result = await signInWithEmail(email.trim(), password);
-    setLoading(false);
-
-    if (result.success) {
-      onLogin();
-    } else {
-      Alert.alert('Giriş Hatası', result.error || 'Giriş yapılamadı');
-    }
-  };
-
-  const handleSocialLogin = (platform: string) => {
-    Alert.alert('Geliştiriliyor', `${platform} ile giriş özelliği yakında eklenecek`);
+  const handleLogin = () => {
+    onLogin();
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Icon name="chevron-back" size={24} color="#2C3E50" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Title */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          Şimdi <Text style={styles.highlightText}>Giriş Yap!</Text>
-        </Text>
-        <Text style={styles.subtitle}>
-          Devam edebilmek için lütfen giriş yap...
-        </Text>
-      </View>
-
-      {/* Form */}
-      <View style={styles.formContainer}>
-        {/* Email Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Mail Adresinizi Giriniz...</Text>
-          <TextInput
-            style={styles.textInput}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholder=""
-          />
-        </View>
-
-        {/* Password Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            placeholder="**********"
-          />
-          <TouchableOpacity 
-            style={styles.eyeButton}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Icon 
-              name={showPassword ? "eye-off" : "eye"} 
-              size={20} 
-              color="#7F8C8D" 
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Forgot Password */}
-        <TouchableOpacity 
-          style={styles.forgotPasswordContainer}
-          onPress={onNavigateToForgotPassword}
+      <KeyboardAvoidingView 
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView 
+          style={styles.flex}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="always"
+          bounces={false}
         >
-          <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
-        </TouchableOpacity>
+          <View style={styles.content}>
+            <View style={styles.headerContainer}>
+              <Text style={styles.title}>
+                Şimdi <Text style={styles.highlightText}>Giriş Yap!</Text>
+              </Text>
+              <Text style={styles.subtitle}>
+                Devam edebilmek için lütfen giriş yap...
+              </Text>
+            </View>
 
-        {/* Login Button */}
-        <TouchableOpacity 
-          style={styles.loginButton} 
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.loginButtonText}>Giriş Yap</Text>
-          )}
-        </TouchableOpacity>
+            <View style={styles.formContainer}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Mail Adresinizi Giriniz...</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
 
-        {/* Register Link */}
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>Henüz bir hesabın yok mu? </Text>
-          <TouchableOpacity onPress={onNavigateToRegister}>
-            <Text style={styles.registerLink}>Kayıt Ol</Text>
-          </TouchableOpacity>
-        </View>
+              <View style={styles.inputContainer}>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="**********"
+                    placeholderTextColor="#999"
+                    secureTextEntry={!isPasswordVisible}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                  >
+                    <Ionicons
+                      name={isPasswordVisible ? 'eye-off' : 'eye'}
+                      size={20}
+                      color="#999"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-        {/* Social Login */}
-        <View style={styles.socialContainer}>
-          <Text style={styles.socialTitle}>Uygulamızı Öner!</Text>
-          <View style={styles.socialButtons}>
-            <TouchableOpacity 
-              style={[styles.socialButton, styles.facebookButton]}
-              onPress={() => handleSocialLogin('Facebook')}
-            >
-              <Icon name="logo-facebook" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.socialButton, styles.instagramButton]}
-              onPress={() => handleSocialLogin('Instagram')}
-            >
-              <Icon name="logo-instagram" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.socialButton, styles.twitterButton]}
-              onPress={() => handleSocialLogin('Twitter')}
-            >
-              <Icon name="logo-twitter" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
+              <TouchableOpacity onPress={onNavigateToForgotPassword}>
+                <Text style={styles.forgotPassword}>Şifremi Unuttum</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+                <Text style={styles.loginButtonText}>Giriş Yap</Text>
+              </TouchableOpacity>
+
+              <View style={styles.signupContainer}>
+                <Text style={styles.signupText}>Henüz bir hesabın yok mu? </Text>
+                <TouchableOpacity onPress={onNavigateToRegister}>
+                  <Text style={styles.signupLink}>Kayıt Ol</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.socialContainer}>
+              <Text style={styles.socialText}>Uygulamızı Öner!</Text>
+              <View style={styles.socialButtons}>
+                <TouchableOpacity style={[styles.socialButton, styles.facebook]}>
+                  <Ionicons name="logo-facebook" size={20} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.socialButton, styles.instagram]}>
+                  <Ionicons name="logo-instagram" size={20} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.socialButton, styles.twitter]}>
+                  <Ionicons name="logo-twitter" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-    </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
   },
-  header: {
-    flexDirection: 'row',
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 80,
+    paddingBottom: 40,
+  },
+  headerContainer: {
+    marginBottom: 80,
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    marginBottom: 40,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F8F9FA',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleContainer: {
-    paddingHorizontal: 32,
-    marginBottom: 50,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 12,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   highlightText: {
     color: '#FF6B35',
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
-    lineHeight: 24,
+    color: '#999',
+    textAlign: 'center',
   },
   formContainer: {
-    flex: 1,
-    paddingHorizontal: 32,
+    marginBottom: 60,
   },
   inputContainer: {
     marginBottom: 20,
-    position: 'relative',
   },
   inputLabel: {
     fontSize: 16,
-    color: '#2C3E50',
+    color: '#333',
     marginBottom: 8,
-    fontWeight: '500',
   },
   textInput: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E7FF',
-    paddingVertical: 12,
-    paddingRight: 50,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     fontSize: 16,
-    color: '#2C3E50',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 16,
   },
   eyeButton: {
-    position: 'absolute',
-    right: 0,
-    bottom: 12,
-    padding: 8,
+    paddingHorizontal: 16,
   },
-  forgotPasswordContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 40,
-  },
-  forgotPasswordText: {
+  forgotPassword: {
     color: '#FF6B35',
     fontSize: 14,
-    fontWeight: '500',
+    textAlign: 'right',
+    marginTop: 8,
+    marginBottom: 40,
   },
   loginButton: {
     backgroundColor: '#24BAEC',
+    borderRadius: 12,
     paddingVertical: 16,
-    borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 32,
-    shadowColor: '#24BAEC',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    marginBottom: 24,
   },
   loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
   },
-  registerContainer: {
+  signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 40,
+    alignItems: 'center',
   },
-  registerText: {
-    color: '#7F8C8D',
+  signupText: {
+    color: '#999',
     fontSize: 14,
   },
-  registerLink: {
+  signupLink: {
     color: '#FF6B35',
     fontSize: 14,
     fontWeight: '600',
@@ -279,11 +238,10 @@ const styles = StyleSheet.create({
   socialContainer: {
     alignItems: 'center',
   },
-  socialTitle: {
+  socialText: {
     color: '#FF6B35',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 20,
+    fontSize: 14,
+    marginBottom: 16,
   },
   socialButtons: {
     flexDirection: 'row',
@@ -291,19 +249,19 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    alignItems: 'center',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  facebookButton: {
+  facebook: {
     backgroundColor: '#1877F2',
   },
-  instagramButton: {
+  instagram: {
     backgroundColor: '#E4405F',
   },
-  twitterButton: {
+  twitter: {
     backgroundColor: '#1DA1F2',
   },
 }); 

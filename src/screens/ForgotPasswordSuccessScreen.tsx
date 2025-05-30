@@ -1,115 +1,101 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ForgotPasswordSuccessScreenProps {
   email: string;
+  onNavigateToVerification: () => void;
 }
 
-const { width } = Dimensions.get('window');
+export default function ForgotPasswordSuccessScreen({ email, onNavigateToVerification }: ForgotPasswordSuccessScreenProps) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onNavigateToVerification();
+    }, 2000); // 2 saniye sonra
 
-export default function ForgotPasswordSuccessScreen({ 
-  email 
-}: ForgotPasswordSuccessScreenProps) {
+    return () => clearTimeout(timer);
+  }, [onNavigateToVerification]);
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Forgot password</Text>
-        <Text style={styles.subtitle}>
-          Enter your email account to reset your password
-        </Text>
-      </View>
-
-      {/* Email Display */}
-      <View style={styles.emailContainer}>
-        <Text style={styles.emailText}>{email}</Text>
-      </View>
-
-      {/* Success Message */}
-      <View style={styles.successContainer}>
-        <View style={styles.iconContainer}>
-          <Icon name="mail-outline" size={60} color="#FF6B35" />
+      <View style={styles.content}>
+        <Text style={styles.email}>{email || 'www.uihut@gmail.com'}</Text>
+        
+        <View style={styles.messageContainer}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="mail" size={40} color="#FF6B35" />
+          </View>
+          
+          <Text style={styles.title}>Mail Adresini Kontrol Et!</Text>
+          <Text style={styles.subtitle}>
+            Şifre sıfırlama linkini{'\n'}e-postanıza gönderdik!
+          </Text>
         </View>
-        <Text style={styles.successTitle}>Mail Adresini Kontrol Et!</Text>
-        <Text style={styles.successMessage}>
-          Şifre sıfırlama linkini e-postanıza gönderdik!
-        </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
-    paddingHorizontal: 32,
+    backgroundColor: '#F5F5F5',
   },
-  header: {
-    paddingTop: 100,
-    marginBottom: 50,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 12,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#7F8C8D',
-    lineHeight: 24,
-  },
-  emailContainer: {
-    marginBottom: 80,
-  },
-  emailText: {
-    fontSize: 16,
-    color: '#2C3E50',
-    fontWeight: '500',
-  },
-  successContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 40,
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 120,
     alignItems: 'center',
+  },
+  email: {
+    fontSize: 16,
+    color: '#333',
+    alignSelf: 'flex-start',
+    marginBottom: 120,
+  },
+  messageContainer: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingVertical: 40,
+    paddingHorizontal: 32,
+    width: '90%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 12,
+    shadowRadius: 8,
     elevation: 8,
   },
   iconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFF3F0',
-    alignItems: 'center',
+    backgroundColor: '#FFF5F0',
     justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 24,
   },
-  successTitle: {
-    fontSize: 20,
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 12,
+    color: '#333',
     textAlign: 'center',
+    marginBottom: 16,
   },
-  successMessage: {
+  subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: '#999',
     textAlign: 'center',
     lineHeight: 24,
   },

@@ -5,13 +5,13 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Dimensions,
   StatusBar,
-  Alert,
-  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { signUpWithEmail, createUserProfile } from '../config/firebase';
+import { Ionicons } from '@expo/vector-icons';
 
 interface RegisterScreenProps {
   onRegister: () => void;
@@ -19,185 +19,159 @@ interface RegisterScreenProps {
   onBack: () => void;
 }
 
-const { width } = Dimensions.get('window');
-
-export default function RegisterScreen({ 
-  onRegister, 
-  onNavigateToLogin, 
-  onBack 
-}: RegisterScreenProps) {
-  const [name, setName] = useState('');
+export default function RegisterScreen({ onRegister, onNavigateToLogin, onBack }: RegisterScreenProps) {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
-      return;
-    }
-
-    if (password.length < 8) {
-      Alert.alert('Hata', 'Şifre en az 8 karakter olmalı!');
-      return;
-    }
-
-    setLoading(true);
-    
-    // Firebase Auth ile kullanıcı oluştur
-    const authResult = await signUpWithEmail(email.trim(), password);
-    
-    if (authResult.success && authResult.user) {
-      // Firestore'a kullanıcı profili ekle
-      const profileResult = await createUserProfile(authResult.user.uid, {
-        name: name.trim(),
-        email: email.trim(),
-        isActive: true,
-        userType: 'customer', // customer or company
-      });
-
-      setLoading(false);
-
-      if (profileResult.success) {
-        Alert.alert(
-          'Başarılı!', 
-          'Hesabınız başarıyla oluşturuldu. Şimdi giriş yapabilirsiniz.',
-          [{ text: 'Tamam', onPress: onRegister }]
-        );
-      } else {
-        Alert.alert('Hata', 'Profil oluşturulamadı');
-      }
-    } else {
-      setLoading(false);
-      Alert.alert('Kayıt Hatası', authResult.error || 'Kayıt olunamadı');
-    }
+  const handleRegister = () => {
+    onRegister();
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Icon name="chevron-back" size={24} color="#2C3E50" />
+          <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
       </View>
 
-      {/* Title */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>
-          Hemen <Text style={styles.highlightText}>Kayıt Ol!</Text>
-        </Text>
-        <Text style={styles.subtitle}>
-          Lütfen alanları doldur ve kaydını tamamla...
-        </Text>
-      </View>
-
-      {/* Form */}
-      <View style={styles.formContainer}>
-        {/* Name Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Ad-Soyad</Text>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            onChangeText={setName}
-            placeholder=""
-            autoCapitalize="words"
-          />
-        </View>
-
-        {/* Email Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Mail</Text>
-          <TextInput
-            style={styles.textInput}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholder=""
-          />
-        </View>
-
-        {/* Password Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            placeholder="**********"
-          />
-          <TouchableOpacity 
-            style={styles.eyeButton}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <Icon 
-              name={showPassword ? "eye-off" : "eye"} 
-              size={20} 
-              color="#7F8C8D" 
-            />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.passwordHint}>Şifre en az 8 karakter olmalı!</Text>
-
-        {/* Register Button */}
-        <TouchableOpacity 
-          style={styles.registerButton} 
-          onPress={handleRegister}
-          disabled={loading}
+      <KeyboardAvoidingView 
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView 
+          style={styles.flex}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="always"
+          bounces={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.registerButtonText}>Kaydı Tamamla</Text>
-          )}
-        </TouchableOpacity>
+          <View style={styles.content}>
+            <View style={styles.headerContainer}>
+              <Text style={styles.title}>
+                Hemen <Text style={styles.highlightText}>Kayıt Ol!</Text>
+              </Text>
+              <Text style={styles.subtitle}>
+                Lütfen alanları doldur ve kaydını tamamla...
+              </Text>
+            </View>
 
-        {/* Login Link */}
-        <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>Mevcut bir hesabın var mı? </Text>
-          <TouchableOpacity onPress={onNavigateToLogin}>
-            <Text style={styles.loginLink}>Giriş Yap</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+            <View style={styles.formContainer}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={fullName}
+                  onChangeText={setFullName}
+                  placeholder="Ad-Soyad"
+                  placeholderTextColor="#999"
+                  autoCapitalize="words"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholder="Mail"
+                  placeholderTextColor="#999"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="**********"
+                    placeholderTextColor="#999"
+                    secureTextEntry={!isPasswordVisible}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                  >
+                    <Ionicons
+                      name={isPasswordVisible ? 'eye-off' : 'eye'}
+                      size={20}
+                      color="#999"
+                    />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.passwordHint}>Şifre en az 8 karakter olmalı!</Text>
+              </View>
+
+              <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+                <Text style={styles.registerButtonText}>Kaydı Tamamla</Text>
+              </TouchableOpacity>
+
+              <View style={styles.loginContainer}>
+                <Text style={styles.loginText}>Mevcut bir hesabın var mı? </Text>
+                <TouchableOpacity onPress={onNavigateToLogin}>
+                  <Text style={styles.loginLink}>Giriş Yap</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    marginBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 10,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F8F9FA',
-    alignItems: 'center',
+    backgroundColor: 'white',
     justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  titleContainer: {
-    paddingHorizontal: 32,
-    marginBottom: 50,
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    minHeight: 600,
+  },
+  headerContainer: {
+    marginBottom: 60,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#333',
+    textAlign: 'center',
     marginBottom: 12,
   },
   highlightText: {
@@ -205,70 +179,66 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
-    lineHeight: 24,
+    color: '#999',
+    textAlign: 'center',
   },
   formContainer: {
     flex: 1,
-    paddingHorizontal: 32,
   },
   inputContainer: {
-    marginBottom: 20,
-    position: 'relative',
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#2C3E50',
-    marginBottom: 8,
-    fontWeight: '500',
+    marginBottom: 24,
   },
   textInput: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E7FF',
-    paddingVertical: 12,
-    paddingRight: 50,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     fontSize: 16,
-    color: '#2C3E50',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 16,
   },
   eyeButton: {
-    position: 'absolute',
-    right: 0,
-    bottom: 12,
-    padding: 8,
+    paddingHorizontal: 16,
   },
   passwordHint: {
-    color: '#7F8C8D',
+    color: '#999',
     fontSize: 12,
-    marginBottom: 40,
-    marginTop: -10,
+    marginTop: 8,
   },
   registerButton: {
     backgroundColor: '#24BAEC',
-    paddingVertical: 16,
-    borderRadius: 25,
+    borderRadius: 12,
+    paddingVertical: 18,
     alignItems: 'center',
-    marginBottom: 32,
-    shadowColor: '#24BAEC',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    marginBottom: 24,
+    marginTop: 32,
   },
   registerButtonText: {
-    color: '#FFFFFF',
+    color: 'white',
     fontSize: 18,
     fontWeight: '600',
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 40,
+    alignItems: 'center',
   },
   loginText: {
-    color: '#7F8C8D',
+    color: '#999',
     fontSize: 14,
   },
   loginLink: {

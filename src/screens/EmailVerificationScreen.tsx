@@ -5,216 +5,204 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Dimensions,
   StatusBar,
-  Alert,
-  ActivityIndicator,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 interface EmailVerificationScreenProps {
-  onBack: () => void;
   onVerify: () => void;
+  onBack: () => void;
   email: string;
 }
 
-const { width } = Dimensions.get('window');
-
-export default function EmailVerificationScreen({ 
-  onBack, 
-  onVerify,
-  email 
-}: EmailVerificationScreenProps) {
+export default function EmailVerificationScreen({ onVerify, onBack, email }: EmailVerificationScreenProps) {
   const [code, setCode] = useState(['', '', '', '']);
-  const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState(86); // 01:26
-  const inputs = useRef<TextInput[]>([]);
+  const [timer, setTimer] = useState(86); // 1:26 = 86 seconds
+  const inputRefs = [useRef<TextInput>(null), useRef<TextInput>(null), useRef<TextInput>(null), useRef<TextInput>(null)];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const handleCodeChange = (value: string, index: number) => {
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
 
-    // Auto focus next input
     if (value && index < 3) {
-      inputs.current[index + 1]?.focus();
+      inputRefs[index + 1].current?.focus();
     }
   };
 
-  const handleKeyPress = (key: string, index: number) => {
-    if (key === 'Backspace' && !code[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+  const handleBackspace = (index: number) => {
+    if (index > 0 && !code[index]) {
+      inputRefs[index - 1].current?.focus();
     }
   };
 
-  const handleVerify = async () => {
-    const verificationCode = code.join('');
-    
-    if (verificationCode.length !== 4) {
-      Alert.alert('Hata', 'Lütfen 4 haneli doğrulama kodunu girin');
-      return;
-    }
-
-    setLoading(true);
-    
-    // Simulate verification (replace with actual verification logic)
-    setTimeout(() => {
-      setLoading(false);
-      if (verificationCode === '8695') { // Mock verification
-        Alert.alert(
-          'Başarılı!',
-          'Email adresiniz başarıyla doğrulandı.',
-          [{ text: 'Tamam', onPress: onVerify }]
-        );
-      } else {
-        Alert.alert('Hata', 'Doğrulama kodu hatalı');
-      }
-    }, 1500);
+  const handleVerify = () => {
+    onVerify();
   };
 
-  const handleResendCode = () => {
-    if (timer > 0) return;
-    
-    Alert.alert('Kod Gönderildi', 'Yeni doğrulama kodu email adresinize gönderildi');
-    setTimer(86);
-    setCode(['', '', '', '']);
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Icon name="chevron-back" size={24} color="#2C3E50" />
+          <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
       </View>
 
-      {/* Title */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Mail Doğrulama</Text>
-        <Text style={styles.subtitle}>
-          Doğrulama kodunu görmek için lütfen{' '}
-          <Text style={styles.emailText}>{email}</Text> adresindeki e-postanızı kontrol edin.
-        </Text>
-      </View>
-
-      {/* Code Input */}
-      <View style={styles.formContainer}>
-        <Text style={styles.codeLabel}>Doğrulama Kodu</Text>
-        
-        <View style={styles.codeInputContainer}>
-          {code.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => {
-                if (ref) inputs.current[index] = ref;
-              }}
-              style={styles.codeInput}
-              value={digit}
-              onChangeText={(value) => handleCodeChange(value, index)}
-              onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
-              keyboardType="numeric"
-              maxLength={1}
-              textAlign="center"
-            />
-          ))}
-        </View>
-
-        {/* Verify Button */}
-        <TouchableOpacity 
-          style={styles.verifyButton} 
-          onPress={handleVerify}
-          disabled={loading}
+      <KeyboardAvoidingView 
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      >
+        <ScrollView 
+          style={styles.flex}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="always"
+          bounces={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.verifyButtonText}>Doğrula</Text>
-          )}
-        </TouchableOpacity>
+          <View style={styles.content}>
+            <View style={styles.headerContainer}>
+              <Text style={styles.title}>Mail Doğrulama</Text>
+              <Text style={styles.subtitle}>
+                Doğrulama kodunu görmek için lütfen{'\n'}
+                <Text style={styles.emailText}>{email || 'tunahankorkmaz@gmail.com'}</Text> adresindeki{'\n'}
+                e-postanızı kontrol edin.
+              </Text>
+            </View>
 
-        {/* Timer and Resend */}
-        <View style={styles.resendContainer}>
-          <Text style={styles.timerText}>Kodu yeniden gönder</Text>
-          <Text style={styles.timerValue}>{formatTime(timer)}</Text>
-        </View>
+            <View style={styles.formContainer}>
+              <Text style={styles.codeLabel}>Doğrulama Kodu</Text>
+              
+              <View style={styles.codeContainer}>
+                {code.map((digit, index) => (
+                  <TextInput
+                    key={index}
+                    ref={inputRefs[index]}
+                    style={styles.codeInput}
+                    value={digit}
+                    onChangeText={(value) => handleCodeChange(value, index)}
+                    onKeyPress={({ nativeEvent }) => {
+                      if (nativeEvent.key === 'Backspace') {
+                        handleBackspace(index);
+                      }
+                    }}
+                    maxLength={1}
+                    keyboardType="numeric"
+                    textAlign="center"
+                  />
+                ))}
+              </View>
 
-        {timer === 0 && (
-          <TouchableOpacity onPress={handleResendCode}>
-            <Text style={styles.resendText}>Kodu Tekrar Gönder</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
+              <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
+                <Text style={styles.verifyButtonText}>Doğrula</Text>
+              </TouchableOpacity>
+
+              <View style={styles.timerContainer}>
+                <Text style={styles.timerText}>Kodu yeniden gönder</Text>
+                <Text style={styles.timer}>{formatTime(timer)}</Text>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    marginBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 10,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F8F9FA',
-    alignItems: 'center',
+    backgroundColor: 'white',
     justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  titleContainer: {
-    paddingHorizontal: 32,
-    marginBottom: 50,
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    minHeight: 600,
+  },
+  headerContainer: {
+    marginBottom: 60,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 12,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: '#999',
+    textAlign: 'center',
     lineHeight: 24,
   },
   emailText: {
-    color: '#2C3E50',
-    fontWeight: '600',
+    color: '#333',
+    fontWeight: '500',
   },
   formContainer: {
     flex: 1,
-    paddingHorizontal: 32,
   },
   codeLabel: {
-    fontSize: 18,
-    color: '#2C3E50',
-    marginBottom: 30,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 40,
   },
-  codeInputContainer: {
+  codeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 40,
@@ -223,53 +211,37 @@ const styles = StyleSheet.create({
   codeInput: {
     width: 60,
     height: 60,
-    borderWidth: 2,
-    borderColor: '#E0E7FF',
+    backgroundColor: 'white',
     borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    backgroundColor: '#F8F9FA',
+    color: '#333',
   },
   verifyButton: {
     backgroundColor: '#24BAEC',
-    paddingVertical: 16,
-    borderRadius: 25,
+    borderRadius: 12,
+    paddingVertical: 18,
     alignItems: 'center',
     marginBottom: 30,
-    shadowColor: '#24BAEC',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
   verifyButtonText: {
-    color: '#FFFFFF',
+    color: 'white',
     fontSize: 18,
     fontWeight: '600',
   },
-  resendContainer: {
+  timerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
   },
   timerText: {
-    color: '#7F8C8D',
     fontSize: 14,
+    color: '#999',
   },
-  timerValue: {
-    color: '#2C3E50',
+  timer: {
     fontSize: 14,
-    fontWeight: '600',
-  },
-  resendText: {
-    color: '#FF6B35',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    color: '#999',
   },
 }); 

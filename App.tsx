@@ -8,57 +8,48 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import EmailVerificationScreen from './src/screens/EmailVerificationScreen';
-import ForgotPasswordSuccessScreen from './src/screens/ForgotPasswordSuccessScreen';
-import { AuthProvider, useAuth } from './src/context/AuthContext';
 
-type AppState = 'loading' | 'splash' | 'onboarding' | 'login' | 'register' | 'forgotPassword' | 'forgotPasswordSuccess' | 'emailVerification' | 'main';
+type AppState = 'loading' | 'splash' | 'onboarding' | 'login' | 'register' | 'forgotPassword' | 'emailVerification' | 'main';
 
-const ONBOARDING_COMPLETED_KEY = '@onboarding_completed';
+const ONBOARDING_COMPLETED_KEY = '@karatekin_travel:onboarding_completed';
 
-function AppContent() {
+function App() {
   const [appState, setAppState] = useState<AppState>('loading');
   const [tempEmail, setTempEmail] = useState('');
-  const { user, loading: authLoading } = useAuth();
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
     checkOnboardingStatus();
   }, []);
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      setAppState('main');
-    }
-  }, [user, authLoading]);
-
   const checkOnboardingStatus = async () => {
     try {
-      const hasCompletedOnboarding = await AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY);
-      if (hasCompletedOnboarding) {
-        setAppState('splash');
-        setTimeout(() => {
-          setAppState('login');
-        }, 3000);
-      } else {
-        setAppState('splash');
-      }
+      const onboardingCompleted = await AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY);
+      const isCompleted = onboardingCompleted === 'true';
+      setHasCompletedOnboarding(isCompleted);
+      
+      // Splash screen'i her zaman göster
+      setAppState('splash');
     } catch (error) {
       console.error('Error checking onboarding status:', error);
+      setHasCompletedOnboarding(false);
       setAppState('splash');
     }
   };
 
   const handleSplashFinish = useCallback(async () => {
-    const hasCompletedOnboarding = await AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY);
+    // Onboarding tamamlanmışsa login'e git, yoksa onboarding'e git
     if (hasCompletedOnboarding) {
       setAppState('login');
     } else {
       setAppState('onboarding');
     }
-  }, []);
+  }, [hasCompletedOnboarding]);
 
   const handleOnboardingComplete = useCallback(async () => {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
+      setHasCompletedOnboarding(true);
       setAppState('login');
     } catch (error) {
       console.error('Error saving onboarding status:', error);
@@ -83,11 +74,17 @@ function AppContent() {
     setAppState('forgotPassword');
   }, []);
 
-  const handleForgotPasswordSuccess = useCallback(() => {
-    setAppState('forgotPasswordSuccess');
+  const handleForgotPasswordSuccess = useCallback((email: string) => {
+    setTempEmail(email);
+    setAppState('emailVerification');
   }, []);
 
-  const handleRegisterSuccess = useCallback(() => {
+  const handleForgotPasswordToVerification = useCallback(() => {
+    setAppState('emailVerification');
+  }, []);
+
+  const handleRegisterSuccess = useCallback((email: string) => {
+    setTempEmail(email);
     setAppState('emailVerification');
   }, []);
 
@@ -113,7 +110,7 @@ function AppContent() {
 
   if (appState === 'login') {
     return (
-      <LoginScreen 
+      <LoginScreen
         onLogin={handleLogin}
         onNavigateToRegister={handleNavigateToRegister}
         onNavigateToForgotPassword={handleNavigateToForgotPassword}
@@ -123,8 +120,8 @@ function AppContent() {
 
   if (appState === 'register') {
     return (
-      <RegisterScreen 
-        onRegister={handleRegisterSuccess}
+      <RegisterScreen
+        onRegister={() => handleRegisterSuccess('user@example.com')}
         onNavigateToLogin={handleNavigateToLogin}
         onBack={handleBack}
       />
@@ -133,22 +130,18 @@ function AppContent() {
 
   if (appState === 'forgotPassword') {
     return (
-      <ForgotPasswordScreen 
+      <ForgotPasswordScreen
+        onResetPassword={() => handleForgotPasswordSuccess('www.uihut@gmail.com')}
         onBack={handleBack}
-        onSuccess={handleForgotPasswordSuccess}
       />
     );
   }
 
-  if (appState === 'forgotPasswordSuccess') {
-    return <ForgotPasswordSuccessScreen email={tempEmail} />;
-  }
-
   if (appState === 'emailVerification') {
     return (
-      <EmailVerificationScreen 
-        onBack={handleNavigateToLogin}
+      <EmailVerificationScreen
         onVerify={handleEmailVerificationSuccess}
+        onBack={handleBack}
         email={tempEmail}
       />
     );
@@ -163,13 +156,7 @@ function AppContent() {
   );
 }
 
-export default function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
-}
+export default App;
 
 const styles = StyleSheet.create({
   loadingContainer: {
