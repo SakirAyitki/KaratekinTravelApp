@@ -11,9 +11,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AllTripsScreen from './AllTripsScreen';
+import TripDetailScreen from './TripDetailScreen';
 
 export default function HomeScreen() {
   const [showAllTrips, setShowAllTrips] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
 
   const handleTabPress = (tab: string) => {
     console.log(`${tab} tab pressed`);
@@ -27,8 +29,20 @@ export default function HomeScreen() {
     setShowAllTrips(false);
   };
 
+  const handleTripPress = (trip: any) => {
+    setSelectedTrip(trip);
+  };
+
+  const handleBackFromTripDetail = () => {
+    setSelectedTrip(null);
+  };
+
   if (showAllTrips) {
     return <AllTripsScreen onBack={handleBackFromAllTrips} />;
+  }
+
+  if (selectedTrip) {
+    return <TripDetailScreen onBack={handleBackFromTripDetail} tripData={selectedTrip} />;
   }
 
   const currentTrips = [
@@ -37,6 +51,8 @@ export default function HomeScreen() {
       title: 'Amasra Turu',
       location: 'Amasra, Türkiye',
       rating: 4.7,
+      reviewCount: 2498,
+      price: '$250/Kişi',
       peopleCount: '+50'
     },
     {
@@ -44,6 +60,8 @@ export default function HomeScreen() {
       title: 'Darıca Turu',
       location: 'Darıca, Türkiye',
       rating: 4.5,
+      reviewCount: 1856,
+      price: '$180/Kişi',
       peopleCount: '+30'
     },
     {
@@ -51,6 +69,8 @@ export default function HomeScreen() {
       title: 'Sapanca Turu',
       location: 'Sapanca, Türkiye',
       rating: 4.8,
+      reviewCount: 3247,
+      price: '$320/Kişi',
       peopleCount: '+25'
     },
     {
@@ -58,6 +78,8 @@ export default function HomeScreen() {
       title: 'Abant Turu',
       location: 'Abant, Türkiye',
       rating: 4.6,
+      reviewCount: 1965,
+      price: '$280/Kişi',
       peopleCount: '+40'
     }
   ];
@@ -106,7 +128,7 @@ export default function HomeScreen() {
           contentContainerStyle={styles.cardsContainer}
         >
           {currentTrips.map((trip, index) => (
-            <TouchableOpacity key={trip.id} style={styles.tripCard}>
+            <TouchableOpacity key={trip.id} style={styles.tripCard} onPress={() => handleTripPress(trip)}>
               <View style={styles.cardImageContainer}>
                 <Image 
                   source={require('../../assets/ob1.png')} 
@@ -134,9 +156,8 @@ export default function HomeScreen() {
                     <Image source={{ uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face&auto=format' }} style={[styles.smallAvatar, styles.avatarOverlap]} />
                     <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face&auto=format' }} style={[styles.smallAvatar, styles.avatarOverlap]} />
                     <Image source={{ uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face&auto=format' }} style={[styles.smallAvatar, styles.avatarOverlap]} />
-                    <Image source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face&auto=format' }} style={[styles.smallAvatar, styles.avatarOverlap]} />
                     <Image source={{ uri: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face&auto=format' }} style={[styles.smallAvatar, styles.avatarOverlap]} />
-                    </View>
+                  </View>
                   <Text style={styles.peopleText}>{trip.peopleCount}</Text>
                 </View>
               </View>
@@ -162,33 +183,49 @@ export default function HomeScreen() {
             {
               id: 1,
               title: 'Amasra Turu',
+              location: 'Amasra, Türkiye',
+              rating: 4.7,
+              reviewCount: 2498,
+              price: '$250/Kişi',
               date: '26 Ekim 2025',
-              location: 'Amasra o Kastamonu',
+              fullLocation: 'Amasra o Kastamonu',
               status: 'Tamamlandı'
             },
             {
               id: 2,
               title: 'Sapanca Turu',
+              location: 'Sapanca, Türkiye',
+              rating: 4.8,
+              reviewCount: 3247,
+              price: '$320/Kişi',
               date: '15 Ekim 2025',
-              location: 'Sapanca, Sakarya',
+              fullLocation: 'Sapanca, Sakarya',
               status: 'Tamamlandı'
             },
             {
               id: 3,
               title: 'Bolu Turu',
+              location: 'Bolu, Türkiye',
+              rating: 4.6,
+              reviewCount: 1965,
+              price: '$280/Kişi',
               date: '8 Ekim 2025',
-              location: 'Bolu Merkez',
+              fullLocation: 'Bolu Merkez',
               status: 'Tamamlandı'
             },
             {
               id: 4,
               title: 'Darıca Turu',
+              location: 'Darıca, Türkiye',
+              rating: 4.5,
+              reviewCount: 1856,
+              price: '$180/Kişi',
               date: '1 Ekim 2025',
-              location: 'Darıca, Kocaeli',
+              fullLocation: 'Darıca, Kocaeli',
               status: 'Tamamlandı'
             }
           ].map((trip) => (
-            <TouchableOpacity key={trip.id} style={styles.pastTripCard}>
+            <TouchableOpacity key={trip.id} style={styles.pastTripCard} onPress={() => handleTripPress(trip)}>
               <Image 
                 source={require('../../assets/ob2.png')} 
                 style={styles.pastTripCardImage}
@@ -201,7 +238,7 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.pastTripCardLocation}>
                   <Ionicons name="location-outline" size={14} color="#999" />
-                  <Text style={styles.pastTripCardLocationText}>{trip.location}</Text>
+                  <Text style={styles.pastTripCardLocationText}>{trip.fullLocation}</Text>
                 </View>
                 <View style={styles.pastTripCardStatus}>
                   <View style={styles.statusIndicator} />
@@ -532,7 +569,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F0F0F0',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingBottom: 10,
+    paddingBottom: 20,
   },
   tabItem: {
     alignItems: 'center',

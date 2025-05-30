@@ -11,6 +11,7 @@ import {
   TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import TripDetailScreen from './TripDetailScreen';
 
 interface AllTripsScreenProps {
   onBack: () => void;
@@ -19,46 +20,55 @@ interface AllTripsScreenProps {
 export default function AllTripsScreen({ onBack }: AllTripsScreenProps) {
   const [searchText, setSearchText] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('En Çok Beğenilen');
+  const [selectedTrip, setSelectedTrip] = useState(null);
 
   const allTripsData = [
     {
       id: 1,
       title: 'Amasra Turu',
+      location: 'Amasra, Türkiye',
       dateRange: '20 Haziran - 29 Haziran',
       capacity: 'Kapasite 50 Kişi',
       joined: '24 Kişi Katıldı',
       price: '$720',
       rating: 4.7,
+      reviewCount: 2498,
       date: new Date('2024-06-20')
     },
     {
       id: 2,
       title: 'Karadeniz Turu',
+      location: 'Karadeniz, Türkiye',
       dateRange: '15 Temmuz - 25 Temmuz',
       capacity: 'Kapasite 40 Kişi',
       joined: '18 Kişi Katıldı',
       price: '$650',
       rating: 4.5,
+      reviewCount: 1856,
       date: new Date('2024-07-15')
     },
     {
       id: 3,
       title: 'Sapanca Turu',
+      location: 'Sapanca, Türkiye',
       dateRange: '10 Ağustos - 15 Ağustos',
       capacity: 'Kapasite 30 Kişi',
       joined: '22 Kişi Katıldı',
       price: '$480',
       rating: 4.8,
+      reviewCount: 3247,
       date: new Date('2024-08-10')
     },
     {
       id: 4,
       title: 'Bolu Turu',
+      location: 'Bolu, Türkiye',
       dateRange: '5 Eylül - 12 Eylül',
       capacity: 'Kapasite 35 Kişi',
       joined: '19 Kişi Katıldı',
       price: '$580',
       rating: 4.6,
+      reviewCount: 1965,
       date: new Date('2024-09-05')
     }
   ];
@@ -88,7 +98,19 @@ export default function AllTripsScreen({ onBack }: AllTripsScreenProps) {
     setSelectedFilter(filter);
   };
 
+  const handleTripPress = (trip: any) => {
+    setSelectedTrip(trip);
+  };
+
+  const handleBackFromTripDetail = () => {
+    setSelectedTrip(null);
+  };
+
   const filteredTrips = getFilteredTrips();
+
+  if (selectedTrip) {
+    return <TripDetailScreen onBack={handleBackFromTripDetail} tripData={selectedTrip} />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -157,7 +179,7 @@ export default function AllTripsScreen({ onBack }: AllTripsScreenProps) {
         {/* Trips List */}
         <View style={styles.tripsContainer}>
           {filteredTrips.map((trip) => (
-            <TouchableOpacity key={trip.id} style={styles.tripCard}>
+            <TouchableOpacity key={trip.id} style={styles.tripCard} onPress={() => handleTripPress(trip)}>
               <Image 
                 source={require('../../assets/ob1.png')} 
                 style={styles.tripImage}
