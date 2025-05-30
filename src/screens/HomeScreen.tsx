@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,26 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AllTripsScreen from './AllTripsScreen';
 
 export default function HomeScreen() {
+  const [showAllTrips, setShowAllTrips] = useState(false);
+
   const handleTabPress = (tab: string) => {
     console.log(`${tab} tab pressed`);
   };
+
+  const handleShowAllTrips = () => {
+    setShowAllTrips(true);
+  };
+
+  const handleBackFromAllTrips = () => {
+    setShowAllTrips(false);
+  };
+
+  if (showAllTrips) {
+    return <AllTripsScreen onBack={handleBackFromAllTrips} />;
+  }
 
   const currentTrips = [
     {
@@ -79,7 +94,7 @@ export default function HomeScreen() {
         {/* Güncel Geziler */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Güncel Geziler</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleShowAllTrips}>
             <Text style={styles.seeAllText}>Tümü</Text>
           </TouchableOpacity>
         </View>
@@ -94,7 +109,7 @@ export default function HomeScreen() {
             <TouchableOpacity key={trip.id} style={styles.tripCard}>
               <View style={styles.cardImageContainer}>
                 <Image 
-                  source={require('../../assets/tb0.png')} 
+                  source={require('../../assets/ob1.png')} 
                   style={styles.cardImage}
                 />
                 <TouchableOpacity style={styles.bookmarkButton}>
@@ -137,29 +152,65 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.pastTripsContainer}>
-          {[1, 2, 3, 4].map((item) => (
-            <TouchableOpacity key={item} style={styles.pastTripItem}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalScroll}
+          contentContainerStyle={styles.cardsContainer}
+        >
+          {[
+            {
+              id: 1,
+              title: 'Amasra Turu',
+              date: '26 Ekim 2025',
+              location: 'Amasra o Kastamonu',
+              status: 'Tamamlandı'
+            },
+            {
+              id: 2,
+              title: 'Sapanca Turu',
+              date: '15 Ekim 2025',
+              location: 'Sapanca, Sakarya',
+              status: 'Tamamlandı'
+            },
+            {
+              id: 3,
+              title: 'Bolu Turu',
+              date: '8 Ekim 2025',
+              location: 'Bolu Merkez',
+              status: 'Tamamlandı'
+            },
+            {
+              id: 4,
+              title: 'Darıca Turu',
+              date: '1 Ekim 2025',
+              location: 'Darıca, Kocaeli',
+              status: 'Tamamlandı'
+            }
+          ].map((trip) => (
+            <TouchableOpacity key={trip.id} style={styles.pastTripCard}>
               <Image 
-                source={require('../../assets/tb0.png')} 
-                style={styles.pastTripImage}
+                source={require('../../assets/ob2.png')} 
+                style={styles.pastTripCardImage}
               />
-              <View style={styles.pastTripContent}>
-                <Text style={styles.pastTripTitle}>Amasra Turu</Text>
-                <View style={styles.pastTripInfo}>
+              <View style={styles.pastTripCardContent}>
+                <Text style={styles.pastTripCardTitle}>{trip.title}</Text>
+                <View style={styles.pastTripCardInfo}>
                   <Ionicons name="calendar-outline" size={14} color="#999" />
-                  <Text style={styles.pastTripDate}>26 Ekim 2025</Text>
+                  <Text style={styles.pastTripCardDate}>{trip.date}</Text>
                 </View>
-                <View style={styles.pastTripLocation}>
+                <View style={styles.pastTripCardLocation}>
                   <Ionicons name="location-outline" size={14} color="#999" />
-                  <Text style={styles.pastTripLocationText}>Amasra o Kastamonu</Text>
+                  <Text style={styles.pastTripCardLocationText}>{trip.location}</Text>
+                </View>
+                <View style={styles.pastTripCardStatus}>
+                  <View style={styles.statusIndicator} />
+                  <Text style={styles.statusText}>{trip.status}</Text>
                 </View>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
           ))}
-        </View>
-
+        </ScrollView>
 
       </ScrollView>
 
@@ -386,50 +437,71 @@ const styles = StyleSheet.create({
     color: '#999',
     fontWeight: '500',
   },
-  pastTripsContainer: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
-  },
-  pastTripItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  pastTripImage: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
+  pastTripCard: {
+    width: 280,
+    backgroundColor: 'white',
+    borderRadius: 20,
     marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
   },
-  pastTripContent: {
-    flex: 1,
+  pastTripCardImage: {
+    width: '100%',
+    height: 200,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  pastTripTitle: {
-    fontSize: 16,
+  pastTripCardContent: {
+    padding: 20,
+  },
+  pastTripCardTitle: {
+    fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 6,
+    marginBottom: 12,
   },
-  pastTripInfo: {
+  pastTripCardInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
   },
-  pastTripDate: {
+  pastTripCardDate: {
     fontSize: 14,
     color: '#999',
     marginLeft: 6,
   },
-  pastTripLocation: {
+  pastTripCardLocation: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4,
   },
-  pastTripLocationText: {
+  pastTripCardLocationText: {
     fontSize: 14,
     color: '#999',
     marginLeft: 6,
+  },
+  pastTripCardStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  statusIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#FF6B35',
+    marginRight: 6,
+  },
+  statusText: {
+    fontSize: 14,
+    color: '#999',
+    fontWeight: '500',
   },
   pageIndicator: {
     flexDirection: 'row',
@@ -460,7 +532,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F0F0F0',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingBottom: 50,
+    paddingBottom: 10,
   },
   tabItem: {
     alignItems: 'center',
