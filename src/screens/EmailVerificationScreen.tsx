@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    marginTop: 50,
   },
   flex: {
     flex: 1,
@@ -169,19 +170,19 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 40,
-    minHeight: 600,
+    paddingTop: 80,
+    paddingBottom: 40,
   },
   headerContainer: {
-    marginBottom: 60,
+    marginBottom: 40,
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   subtitle: {
     fontSize: 16,
@@ -194,19 +195,19 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   formContainer: {
-    flex: 1,
+    marginBottom: 60,
   },
   codeLabel: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 40,
+    marginBottom: 32,
   },
   codeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 40,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   codeInput: {
     width: 60,
@@ -222,13 +223,13 @@ const styles = StyleSheet.create({
   verifyButton: {
     backgroundColor: '#24BAEC',
     borderRadius: 12,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 24,
   },
   verifyButtonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   timerContainer: {

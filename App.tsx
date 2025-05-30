@@ -131,7 +131,7 @@ function App() {
   if (appState === 'forgotPassword') {
     return (
       <ForgotPasswordScreen
-        onResetPassword={() => handleForgotPasswordSuccess('www.uihut@gmail.com')}
+        onResetPassword={() => handleForgotPasswordSuccess('www.karatekintravel.com')}
         onBack={handleBack}
       />
     );

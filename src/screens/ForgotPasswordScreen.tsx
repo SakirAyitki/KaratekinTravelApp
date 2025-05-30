@@ -49,9 +49,9 @@ export default function ForgotPasswordScreen({ onResetPassword, onBack }: Forgot
         >
           <View style={styles.content}>
             <View style={styles.headerContainer}>
-              <Text style={styles.title}>Forgot password</Text>
+              <Text style={styles.title}>Şifremi Unuttum</Text>
               <Text style={styles.subtitle}>
-                Enter your email account to reset your password
+                Şifreni sıfırlamak için hesabına{'\n'}kayıtlı mail adresini alana gir.
               </Text>
             </View>
 
@@ -63,7 +63,7 @@ export default function ForgotPasswordScreen({ onResetPassword, onBack }: Forgot
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  placeholder="www.uihut@gmail.com"
+                  placeholder="Mail Adresinizi Giriniz..."
                   placeholderTextColor="#999"
                 />
               </View>
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    marginTop: 50,
   },
   flex: {
     flex: 1,
@@ -113,20 +114,19 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 60,
-    justifyContent: 'center',
-    minHeight: 500,
+    paddingTop: 80,
+    paddingBottom: 40,
   },
   headerContainer: {
     marginBottom: 60,
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   subtitle: {
     fontSize: 16,
@@ -152,12 +152,12 @@ const styles = StyleSheet.create({
   resetButton: {
     backgroundColor: '#24BAEC',
     borderRadius: 12,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: 'center',
   },
   resetButtonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
 }); 

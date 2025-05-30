@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingTop: 10,
   },
   backButton: {
     width: 40,
@@ -151,6 +150,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    marginTop: 50,
   },
   flex: {
     flex: 1,
@@ -161,18 +161,19 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 40,
-    minHeight: 600,
+    paddingTop: 30,
+    paddingBottom: 40,
   },
   headerContainer: {
-    marginBottom: 60,
+    marginBottom: 80,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   highlightText: {
     color: '#FF6B35',
@@ -183,10 +184,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   formContainer: {
-    flex: 1,
+    marginBottom: 40,
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
   textInput: {
     backgroundColor: 'white',
@@ -222,14 +223,14 @@ const styles = StyleSheet.create({
   registerButton: {
     backgroundColor: '#24BAEC',
     borderRadius: 12,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 32,
+    marginTop: 20,
   },
   registerButtonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   loginContainer: {

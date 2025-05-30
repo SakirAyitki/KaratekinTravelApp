@@ -59,13 +59,14 @@ export default function LoginScreen({ onLogin, onNavigateToRegister, onNavigateT
 
             <View style={styles.formContainer}>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Mail Adresinizi Giriniz...</Text>
                 <TextInput
                   style={styles.textInput}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  placeholder="Mail Adresinizi Giriniz..."
+                  placeholderTextColor="#999"
                 />
               </View>
 
@@ -145,6 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 80,
     paddingBottom: 40,
+    marginTop: 30,
   },
   headerContainer: {
     marginBottom: 80,
@@ -170,11 +172,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
   },
   textInput: {
     backgroundColor: 'white',
