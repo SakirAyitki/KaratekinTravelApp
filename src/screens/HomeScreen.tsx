@@ -37,12 +37,22 @@ export default function HomeScreen() {
     setSelectedTrip(null);
   };
 
+  const handleHomeFromTripDetail = () => {
+    setSelectedTrip(null);
+  };
+
   if (showAllTrips) {
     return <AllTripsScreen onBack={handleBackFromAllTrips} />;
   }
 
   if (selectedTrip) {
-    return <TripDetailScreen onBack={handleBackFromTripDetail} tripData={selectedTrip} />;
+    return (
+      <TripDetailScreen 
+        onBack={handleBackFromTripDetail} 
+        onHome={handleHomeFromTripDetail}
+        tripData={selectedTrip} 
+      />
+    );
   }
 
   const currentTrips = [

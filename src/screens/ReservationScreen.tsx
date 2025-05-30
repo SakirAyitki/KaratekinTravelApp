@@ -12,9 +12,11 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import PaymentScreen from './PaymentScreen';
 
 interface ReservationScreenProps {
   onBack: () => void;
+  onHome?: () => void;
 }
 
 interface SeatData {
@@ -22,7 +24,8 @@ interface SeatData {
   status: 'available' | 'selected' | 'male' | 'female';
 }
 
-export default function ReservationScreen({ onBack }: ReservationScreenProps) {
+export default function ReservationScreen({ onBack, onHome }: ReservationScreenProps) {
+  const [showPayment, setShowPayment] = useState(false);
   const [seats, setSeats] = useState<SeatData[]>(() => {
     const initialSeats: SeatData[] = [];
     for (let i = 1; i <= 28; i++) {
@@ -117,6 +120,15 @@ export default function ReservationScreen({ onBack }: ReservationScreenProps) {
       </TouchableOpacity>
     );
   };
+
+  if (showPayment) {
+    return (
+      <PaymentScreen 
+        onBack={() => setShowPayment(false)} 
+        onHome={onHome}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -233,7 +245,10 @@ export default function ReservationScreen({ onBack }: ReservationScreenProps) {
               </View>
 
               {/* Confirm Button */}
-              <TouchableOpacity style={styles.confirmButton}>
+              <TouchableOpacity 
+                style={styles.confirmButton} 
+                onPress={() => setShowPayment(true)}
+              >
                 <Text style={styles.confirmButtonText}>Onayla ve Devam Et</Text>
               </TouchableOpacity>
             </ScrollView>
@@ -501,11 +516,10 @@ const styles = StyleSheet.create({
   },
   popupOverlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
+    top: -70,
+    left: 15,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   popupBubble: {
     position: 'absolute',

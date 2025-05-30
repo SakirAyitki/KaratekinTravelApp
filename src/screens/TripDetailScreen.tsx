@@ -16,6 +16,7 @@ import ReservationScreen from './ReservationScreen';
 
 interface TripDetailScreenProps {
   onBack: () => void;
+  onHome?: () => void;
   tripData?: {
     title: string;
     location: string;
@@ -25,7 +26,7 @@ interface TripDetailScreenProps {
   };
 }
 
-export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenProps) {
+export default function TripDetailScreen({ onBack, onHome, tripData }: TripDetailScreenProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
@@ -69,7 +70,12 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
   }
 
   if (showReservation) {
-    return <ReservationScreen onBack={handleReservationBack} />;
+    return (
+      <ReservationScreen 
+        onBack={handleReservationBack} 
+        onHome={onHome}
+      />
+    );
   }
 
   return (
