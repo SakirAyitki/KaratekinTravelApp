@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreenComponent from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
@@ -8,15 +8,15 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import EmailVerificationScreen from './src/screens/EmailVerificationScreen';
+import HomeScreen from './src/screens/HomeScreen';
 
-type AppState = 'loading' | 'splash' | 'onboarding' | 'login' | 'register' | 'forgotPassword' | 'emailVerification' | 'main';
+type AppState = 'loading' | 'splash' | 'onboarding' | 'login' | 'register' | 'forgotPassword' | 'emailVerification' | 'home';
 
 const ONBOARDING_COMPLETED_KEY = '@karatekin_travel:onboarding_completed';
 
-function App() {
-  const [appState, setAppState] = useState<AppState>('loading');
-  const [tempEmail, setTempEmail] = useState('');
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<AppState>('loading');
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     checkOnboardingStatus();
@@ -26,159 +26,123 @@ function App() {
     try {
       const onboardingCompleted = await AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY);
       const isCompleted = onboardingCompleted === 'true';
-      setHasCompletedOnboarding(isCompleted);
       
       // Splash screen'i her zaman göster
-      setAppState('splash');
+      setCurrentScreen('splash');
     } catch (error) {
       console.error('Error checking onboarding status:', error);
-      setHasCompletedOnboarding(false);
-      setAppState('splash');
+      setCurrentScreen('splash');
     }
   };
 
   const handleSplashFinish = useCallback(async () => {
-    // Onboarding tamamlanmışsa login'e git, yoksa onboarding'e git
-    if (hasCompletedOnboarding) {
-      setAppState('login');
-    } else {
-      setAppState('onboarding');
+    try {
+      const onboardingCompleted = await AsyncStorage.getItem(ONBOARDING_COMPLETED_KEY);
+      const isCompleted = onboardingCompleted === 'true';
+      
+      if (isCompleted) {
+        setCurrentScreen('home');
+      } else {
+        setCurrentScreen('onboarding');
+      }
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setCurrentScreen('onboarding');
     }
-  }, [hasCompletedOnboarding]);
+  }, []);
 
   const handleOnboardingComplete = useCallback(async () => {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
-      setHasCompletedOnboarding(true);
-      setAppState('login');
+      setCurrentScreen('login');
     } catch (error) {
       console.error('Error saving onboarding status:', error);
-      setAppState('login');
+      setCurrentScreen('login');
     }
   }, []);
 
-  // Auth Navigation Handlers
-  const handleLogin = useCallback(() => {
-    setAppState('main');
-  }, []);
-
-  const handleNavigateToRegister = useCallback(() => {
-    setAppState('register');
-  }, []);
-
-  const handleNavigateToLogin = useCallback(() => {
-    setAppState('login');
-  }, []);
-
-  const handleNavigateToForgotPassword = useCallback(() => {
-    setAppState('forgotPassword');
-  }, []);
-
-  const handleForgotPasswordSuccess = useCallback((email: string) => {
-    setTempEmail(email);
-    setAppState('emailVerification');
-  }, []);
-
-  const handleForgotPasswordToVerification = useCallback(() => {
-    setAppState('emailVerification');
-  }, []);
-
-  const handleRegisterSuccess = useCallback((email: string) => {
-    setTempEmail(email);
-    setAppState('emailVerification');
-  }, []);
-
-  const handleEmailVerificationSuccess = useCallback(() => {
-    setAppState('login');
-  }, []);
-
-  const handleBack = useCallback(() => {
-    setAppState('login');
-  }, []);
-
-  if (appState === 'loading') {
-    return <View style={styles.loadingContainer} />;
-  }
-
-  if (appState === 'splash') {
-    return <SplashScreenComponent onAnimationFinish={handleSplashFinish} />;
-  }
-
-  if (appState === 'onboarding') {
-    return <OnboardingScreen onComplete={handleOnboardingComplete} />;
-  }
-
-  if (appState === 'login') {
-    return (
-      <LoginScreen
-        onLogin={handleLogin}
-        onNavigateToRegister={handleNavigateToRegister}
-        onNavigateToForgotPassword={handleNavigateToForgotPassword}
-      />
-    );
-  }
-
-  if (appState === 'register') {
-    return (
-      <RegisterScreen
-        onRegister={() => handleRegisterSuccess('user@example.com')}
-        onNavigateToLogin={handleNavigateToLogin}
-        onBack={handleBack}
-      />
-    );
-  }
-
-  if (appState === 'forgotPassword') {
-    return (
-      <ForgotPasswordScreen
-        onResetPassword={() => handleForgotPasswordSuccess('www.karatekintravel.com')}
-        onBack={handleBack}
-      />
-    );
-  }
-
-  if (appState === 'emailVerification') {
-    return (
-      <EmailVerificationScreen
-        onVerify={handleEmailVerificationSuccess}
-        onBack={handleBack}
-        email={tempEmail}
-      />
-    );
-  }
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'login':
+        return (
+          <LoginScreen
+            onLogin={() => setCurrentScreen('home')}
+            onNavigateToRegister={() => setCurrentScreen('register')}
+            onNavigateToForgotPassword={() => setCurrentScreen('forgotPassword')}
+          />
+        );
+      case 'register':
+        return (
+          <RegisterScreen
+            onRegister={() => {
+              setCurrentScreen('emailVerification');
+            }}
+            onNavigateToLogin={() => setCurrentScreen('login')}
+            onBack={() => setCurrentScreen('login')}
+          />
+        );
+      case 'forgotPassword':
+        return (
+          <ForgotPasswordScreen
+            onResetPassword={() => {
+              setCurrentScreen('emailVerification');
+            }}
+            onBack={() => setCurrentScreen('login')}
+          />
+        );
+      case 'emailVerification':
+        return (
+          <EmailVerificationScreen
+            onVerify={() => setCurrentScreen('home')}
+            onBack={() => setCurrentScreen('login')}
+            email={userEmail}
+          />
+        );
+      case 'home':
+        return <HomeScreen />;
+      case 'loading':
+        return <View style={styles.loadingContainer} />;
+      case 'splash':
+        return <SplashScreenComponent onAnimationFinish={handleSplashFinish} />;
+      case 'onboarding':
+        return <OnboardingScreen onComplete={handleOnboardingComplete} />;
+      default:
+        return <HomeScreen />;
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Karatekin Travel</Text>
-      <Text style={styles.subtitle}>Hoş geldiniz! Ana sayfa yakında gelecek...</Text>
+      {renderScreen()}
       <StatusBar style="auto" />
     </View>
   );
 }
 
-export default App;
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   loadingContainer: {
     flex: 1,
     backgroundColor: '#24BAEC',
   },
-  container: {
+  mainContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#0288D1',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
 });
