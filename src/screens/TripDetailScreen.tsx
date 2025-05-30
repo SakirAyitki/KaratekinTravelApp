@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import RouteScreen from './RouteScreen';
+import ReservationScreen from './ReservationScreen';
 
 interface TripDetailScreenProps {
   onBack: () => void;
@@ -27,6 +28,7 @@ interface TripDetailScreenProps {
 export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
+  const [showReservation, setShowReservation] = useState(false);
 
   const defaultTripData = {
     title: 'Amasra Turu',
@@ -54,8 +56,20 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
     setShowRoute(false);
   };
 
+  const handleReservation = () => {
+    setShowReservation(true);
+  };
+
+  const handleReservationBack = () => {
+    setShowReservation(false);
+  };
+
   if (showRoute) {
     return <RouteScreen onBack={handleRouteBack} />;
+  }
+
+  if (showReservation) {
+    return <ReservationScreen onBack={handleReservationBack} />;
   }
 
   return (
@@ -154,7 +168,7 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
             <TouchableOpacity style={styles.routeButton} onPress={handleRouteView}>
               <Text style={styles.routeButtonText}>Rotayı İncele</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.reservationButton}>
+            <TouchableOpacity style={styles.reservationButton} onPress={handleReservation}>
               <Text style={styles.reservationButtonText}>Rezervasyon Yap</Text>
             </TouchableOpacity>
           </View>
