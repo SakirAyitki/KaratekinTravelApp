@@ -11,6 +11,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RouteScreen from './RouteScreen';
 
 interface TripDetailScreenProps {
   onBack: () => void;
@@ -25,6 +26,7 @@ interface TripDetailScreenProps {
 
 export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showRoute, setShowRoute] = useState(false);
 
   const defaultTripData = {
     title: 'Amasra Turu',
@@ -43,6 +45,18 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
+
+  const handleRouteView = () => {
+    setShowRoute(true);
+  };
+
+  const handleRouteBack = () => {
+    setShowRoute(false);
+  };
+
+  if (showRoute) {
+    return <RouteScreen onBack={handleRouteBack} />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -137,7 +151,7 @@ export default function TripDetailScreen({ onBack, tripData }: TripDetailScreenP
 
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.routeButton}>
+            <TouchableOpacity style={styles.routeButton} onPress={handleRouteView}>
               <Text style={styles.routeButtonText}>Rotayı İncele</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.reservationButton}>
