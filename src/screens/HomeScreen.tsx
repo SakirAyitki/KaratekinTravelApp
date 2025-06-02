@@ -17,6 +17,17 @@ import PastTripDetailScreen from './PastTripDetailScreen';
 import ReviewsScreen from './ReviewsScreen';
 import CalendarScreen from './CalendarScreen';
 import ProgramDetailScreen from './ProgramDetailScreen';
+import ChatsScreen from './ChatsScreen';
+import ChatDetailScreen from './ChatDetailScreen';
+
+interface ChatItem {
+  id: string;
+  groupName: string;
+  lastMessage: string;
+  time: string;
+  isActive: boolean;
+  avatar: string;
+}
 
 export default function HomeScreen() {
   const [showAllTrips, setShowAllTrips] = useState(false);
@@ -27,6 +38,7 @@ export default function HomeScreen() {
   const [showPastTripDetail, setShowPastTripDetail] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [selectedProgramTrip, setSelectedProgramTrip] = useState(null);
+  const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
 
   const handleTabPress = (tab: string) => {
     setActiveTab(tab);
@@ -112,6 +124,14 @@ export default function HomeScreen() {
     setShowPastTrips(true);
   };
 
+  const handleBackFromChatDetail = () => {
+    setSelectedChat(null);
+  };
+
+  const handleChatPress = (chat: ChatItem) => {
+    setSelectedChat(chat);
+  };
+
   // Handle sub-screens that should hide navbar
   if (showAllTrips) {
     return <AllTripsScreen onBack={handleBackFromAllTrips} />;
@@ -160,6 +180,20 @@ export default function HomeScreen() {
     );
   }
 
+  // ChatDetailScreen - navbar'sız
+  if (selectedChat) {
+    return (
+      <ChatDetailScreen
+        onBack={handleBackFromChatDetail}
+        chatData={{
+          groupName: selectedChat.groupName,
+          isActive: selectedChat.isActive,
+          memberCount: 50,
+        }}
+      />
+    );
+  }
+
   const renderMainContent = () => {
     if (activeTab === 'calendar') {
       return (
@@ -168,6 +202,14 @@ export default function HomeScreen() {
             onBack={handleBackToHome}
             onShowProgramDetail={handleShowProgramDetail}
           />
+        </View>
+      );
+    }
+
+    if (activeTab === 'messages') {
+      return (
+        <View style={styles.tabContent}>
+          <ChatsScreen onBack={handleBackToHome} onChatPress={handleChatPress} />
         </View>
       );
     }
@@ -408,7 +450,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity 
           style={styles.centerButton}
-          onPress={() => handleTabPress('search')}
+          onPress={handleShowAllTrips}
         >
           <Ionicons name="search" size={28} color="white" />
         </TouchableOpacity>
