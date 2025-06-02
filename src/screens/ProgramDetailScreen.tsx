@@ -31,7 +31,7 @@ interface TimelineItem {
 const { height: screenHeight } = Dimensions.get('window');
 
 export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailScreenProps) {
-  const [bottomSheetY] = useState(new Animated.Value(screenHeight - 80)); // Navbar yok, altta duracak
+  const [bottomSheetY] = useState(new Animated.Value(screenHeight - 120)); // Başlangıç pozisyonu
   const [isExpanded, setIsExpanded] = useState(false);
 
   const timelineItems: TimelineItem[] = [
@@ -62,11 +62,11 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
       return Math.abs(gestureState.dy) > 5;
     },
     onPanResponderMove: (evt, gestureState) => {
-      const currentPosition = isExpanded ? screenHeight - 450 : screenHeight - 80;
+      const currentPosition = isExpanded ? screenHeight - 400 : screenHeight - 120;
       let newPosition = currentPosition + gestureState.dy;
       
       // Sınırları belirle
-      newPosition = Math.max(screenHeight - 450, Math.min(screenHeight - 80, newPosition));
+      newPosition = Math.max(screenHeight - 400, Math.min(screenHeight - 120, newPosition));
       
       bottomSheetY.setValue(newPosition);
     },
@@ -81,7 +81,7 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
         animateToCollapsed();
       } else {
         // Yarım kalan hareket - eski pozisyona döndür
-        const toValue = isExpanded ? screenHeight - 450 : screenHeight - 80;
+        const toValue = isExpanded ? screenHeight - 400 : screenHeight - 120;
         Animated.spring(bottomSheetY, {
           toValue,
           useNativeDriver: false,
@@ -94,7 +94,7 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
 
   const animateToExpanded = () => {
     Animated.spring(bottomSheetY, {
-      toValue: screenHeight - 450,
+      toValue: screenHeight - 400,
       useNativeDriver: false,
       tension: 100,
       friction: 8,
@@ -104,7 +104,7 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
 
   const animateToCollapsed = () => {
     Animated.spring(bottomSheetY, {
-      toValue: screenHeight - 80,
+      toValue: screenHeight - 120,
       useNativeDriver: false,
       tension: 100,
       friction: 8,
@@ -424,15 +424,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 450,
-    backgroundColor: 'white',
+    height: 500, // Yeterli yükseklik
+    backgroundColor: 'white', // Normal renk
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    bottom: 0,
+    elevation: 5,
+    zIndex: 1000,
   },
   panArea: {
     zIndex: 1,
