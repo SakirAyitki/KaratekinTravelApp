@@ -31,7 +31,7 @@ interface TimelineItem {
 const { height: screenHeight } = Dimensions.get('window');
 
 export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailScreenProps) {
-  const [bottomSheetY] = useState(new Animated.Value(screenHeight - 80)); // Kaydırılabilir kart için
+  const [bottomSheetY] = useState(new Animated.Value(screenHeight - 80)); // Navbar yok, altta duracak
   const [isExpanded, setIsExpanded] = useState(false);
 
   const timelineItems: TimelineItem[] = [
@@ -62,11 +62,11 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
       return Math.abs(gestureState.dy) > 5;
     },
     onPanResponderMove: (evt, gestureState) => {
-      const currentPosition = isExpanded ? screenHeight - 400 : screenHeight - 80;
+      const currentPosition = isExpanded ? screenHeight - 450 : screenHeight - 80;
       let newPosition = currentPosition + gestureState.dy;
       
       // Sınırları belirle
-      newPosition = Math.max(screenHeight - 400, Math.min(screenHeight - 80, newPosition));
+      newPosition = Math.max(screenHeight - 450, Math.min(screenHeight - 80, newPosition));
       
       bottomSheetY.setValue(newPosition);
     },
@@ -81,7 +81,7 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
         animateToCollapsed();
       } else {
         // Yarım kalan hareket - eski pozisyona döndür
-        const toValue = isExpanded ? screenHeight - 400 : screenHeight - 80;
+        const toValue = isExpanded ? screenHeight - 450 : screenHeight - 80;
         Animated.spring(bottomSheetY, {
           toValue,
           useNativeDriver: false,
@@ -94,7 +94,7 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
 
   const animateToExpanded = () => {
     Animated.spring(bottomSheetY, {
-      toValue: screenHeight - 400,
+      toValue: screenHeight - 450,
       useNativeDriver: false,
       tension: 100,
       friction: 8,
@@ -432,6 +432,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
+    bottom: 0,
   },
   panArea: {
     zIndex: 1,

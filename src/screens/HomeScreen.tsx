@@ -14,12 +14,15 @@ import AllTripsScreen from './AllTripsScreen';
 import TripDetailScreen from './TripDetailScreen';
 import PastTripsScreen from './PastTripsScreen';
 import CalendarScreen from './CalendarScreen';
+import ProgramDetailScreen from './ProgramDetailScreen';
 
 export default function HomeScreen() {
   const [showAllTrips, setShowAllTrips] = useState(false);
   const [showPastTrips, setShowPastTrips] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
+  const [showProgramDetail, setShowProgramDetail] = useState(false);
+  const [selectedProgramTrip, setSelectedProgramTrip] = useState(null);
 
   const handleTabPress = (tab: string) => {
     setActiveTab(tab);
@@ -27,6 +30,8 @@ export default function HomeScreen() {
     setShowAllTrips(false);
     setShowPastTrips(false);
     setSelectedTrip(null);
+    setShowProgramDetail(false);
+    setSelectedProgramTrip(null);
   };
 
   const handleShowAllTrips = () => {
@@ -62,6 +67,18 @@ export default function HomeScreen() {
     setShowAllTrips(false);
     setShowPastTrips(false);
     setSelectedTrip(null);
+    setShowProgramDetail(false);
+    setSelectedProgramTrip(null);
+  };
+
+  const handleShowProgramDetail = (tripData: any) => {
+    setSelectedProgramTrip(tripData);
+    setShowProgramDetail(true);
+  };
+
+  const handleBackFromProgramDetail = () => {
+    setShowProgramDetail(false);
+    setSelectedProgramTrip(null);
   };
 
   // Handle sub-screens that should hide navbar
@@ -83,11 +100,24 @@ export default function HomeScreen() {
     );
   }
 
+  // ProgramDetailScreen - navbar'sız
+  if (showProgramDetail) {
+    return (
+      <ProgramDetailScreen 
+        onBack={handleBackFromProgramDetail}
+        tripData={selectedProgramTrip}
+      />
+    );
+  }
+
   const renderMainContent = () => {
     if (activeTab === 'calendar') {
       return (
         <View style={styles.tabContent}>
-          <CalendarScreen onBack={handleBackToHome} />
+          <CalendarScreen 
+            onBack={handleBackToHome}
+            onShowProgramDetail={handleShowProgramDetail}
+          />
         </View>
       );
     }

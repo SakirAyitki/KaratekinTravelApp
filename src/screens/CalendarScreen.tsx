@@ -14,6 +14,7 @@ import ProgramDetailScreen from './ProgramDetailScreen';
 
 interface CalendarScreenProps {
   onBack: () => void;
+  onShowProgramDetail: (tripData: any) => void;
 }
 
 interface CalendarTrip {
@@ -25,7 +26,7 @@ interface CalendarTrip {
   image: any;
 }
 
-export default function CalendarScreen({ onBack }: CalendarScreenProps) {
+export default function CalendarScreen({ onBack, onShowProgramDetail }: CalendarScreenProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
   const [showProgramDetail, setShowProgramDetail] = useState(false);
@@ -333,7 +334,7 @@ export default function CalendarScreen({ onBack }: CalendarScreenProps) {
       style={styles.tripCard}
       onPress={() => {
         setSelectedTrip(trip);
-        setShowProgramDetail(true);
+        onShowProgramDetail(trip);
       }}
     >
       <Image source={trip.image} style={styles.tripImage} />
@@ -362,15 +363,6 @@ export default function CalendarScreen({ onBack }: CalendarScreenProps) {
 
   const weekDates = getWeekDates();
   const selectedTrips = getTripsForSelectedDate();
-
-  if (showProgramDetail) {
-    return (
-      <ProgramDetailScreen 
-        onBack={() => setShowProgramDetail(false)}
-        tripData={selectedTrip}
-      />
-    );
-  }
 
   return (
     <View style={styles.container}>
