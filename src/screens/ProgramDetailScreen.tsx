@@ -33,6 +33,7 @@ const { height: screenHeight } = Dimensions.get('window');
 export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailScreenProps) {
   const [bottomSheetY] = useState(new Animated.Value(screenHeight - 120)); // Başlangıç pozisyonu
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
 
   const timelineItems: TimelineItem[] = [
     {
@@ -206,37 +207,48 @@ export default function ProgramDetailScreen({ onBack, tripData }: ProgramDetailS
               }
             ]}
           >
-            {/* Kaydırılabilir Alan */}
-            <View {...panResponder.panHandlers} style={styles.panArea}>
-              {/* Handle */}
-              <TouchableOpacity onPress={handleToggle} style={styles.handleContainer}>
+            {/* Handle - Sadece burası kaydırılabilir */}
+            <TouchableOpacity 
+              onPress={handleToggle} 
+              style={styles.handleContainer}
+            >
+              <View 
+                {...panResponder.panHandlers} 
+                style={styles.handleArea}
+              >
                 <View style={styles.handle} />
-              </TouchableOpacity>
-
-              {/* İlk görünür içerik */}
-              <View style={styles.visibleContent}>
-                <Text style={styles.swipeUpText}>
-                  {isExpanded ? 'Aşağı kaydırarak kapat' : 'Detaylar için yukarı kaydırın'}
-                </Text>
               </View>
-            </View>
+              <Text style={styles.swipeUpText}>
+                {isExpanded ? 'Aşağı kaydırarak kapat' : 'Detaylar için yukarı kaydırın'}
+              </Text>
+            </TouchableOpacity>
 
             {/* Tur Detayları İçerik */}
-            <View style={styles.detailContent}>
+            <ScrollView 
+              style={styles.detailContent} 
+              showsVerticalScrollIndicator={false}
+              bounces={true}
+              scrollEnabled={true}
+              contentContainerStyle={styles.scrollContent}
+            >
               <Text style={styles.detailTitle}>Tur Hakkında</Text>
               
               <Text style={styles.detailDescription}>
-                You will get a complete travel package on the beaches. Packages in the form of airline tickets, recommended Hotel rooms, and transportation that have you ever been on holiday to the Greek ETC...
+                {isTextExpanded 
+                  ? "Amasra'da unutulmaz bir tatil deneyimi yaşayacaksınız. Sahillerde deniz keyfi, tarihi yerlerinde kültür turu ve doğal güzellikleri keşfederken harika anılar biriktireceğiniz tam paket bir seyahat deneyimi sunuyoruz. Airline biletleri, önerilen otel odaları ve ulaşım hizmetleri dahil olmak üzere her şey düşünülmüş. Yunanistan'da tatil yapmış gibi hissedeceksiniz. deneyimi yaşayacaksınız. Sahillerde deniz keyfi, tarihi yerlerinde kültür turu ve doğal güzellikleri keşfederken harika anılar biriktireceğiniz tam paket bir seyahat...deneyimi yaşayacaksınız. Sahillerde deniz keyfi, tarihi yerlerinde kültür turu ve doğal güzellikleri keşfederken harika anılar biriktireceğiniz tam paket bir seyahat..."
+                  : "Amasra'da unutulmaz bir tatil deneyimi yaşayacaksınız. Sahillerde deniz keyfi, tarihi yerlerinde kültür turu ve doğal güzellikleri keşfederken harika anılar biriktireceğiniz tam paket bir seyahat... "
+                }
               </Text>
               
-              <TouchableOpacity style={styles.readMoreButton}>
-                <Text style={styles.readMoreText}>Read More</Text>
+              <TouchableOpacity 
+                style={styles.readMoreButton}
+                onPress={() => setIsTextExpanded(!isTextExpanded)}
+              >
+                <Text style={styles.readMoreText}>
+                  {isTextExpanded ? 'Daha Az Göster' : 'Devamını Oku'}
+                </Text>
               </TouchableOpacity>
-
-              <TouchableOpacity style={styles.detailButton}>
-                <Text style={styles.detailButtonText}>Tur Detaylarını Görüntüle</Text>
-              </TouchableOpacity>
-            </View>
+            </ScrollView>
           </Animated.View>
         </View>
       </ImageBackground>
@@ -436,23 +448,22 @@ const styles = StyleSheet.create({
     elevation: 10, // Android için yüksek elevation
     zIndex: 9999, // En üstte
   },
-  panArea: {
-    zIndex: 1,
-  },
   handleContainer: {
     alignItems: 'center',
     paddingVertical: 15,
+    paddingHorizontal: 20,
+  },
+  handleArea: {
+    width: '100%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   handle: {
     width: 40,
     height: 4,
     backgroundColor: '#E0E0E0',
     borderRadius: 2,
-  },
-  visibleContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    alignItems: 'center',
   },
   swipeUpText: {
     fontSize: 14,
@@ -478,22 +489,16 @@ const styles = StyleSheet.create({
   readMoreButton: {
     alignSelf: 'flex-start',
     marginBottom: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   readMoreText: {
     fontSize: 14,
     color: '#FF6B35',
-    fontWeight: '500',
-  },
-  detailButton: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 25,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  detailButtonText: {
-    fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    marginBottom: 50,
+  },
+  scrollContent: {
+    paddingBottom: 40, // Alt için yeterli boşluk
   },
 }); 
