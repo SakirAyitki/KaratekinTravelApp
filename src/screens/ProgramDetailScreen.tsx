@@ -347,7 +347,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     marginHorizontal: 20,
-    marginBottom: 100, // Alt karta yer bırak
+    marginBottom: 170, // Bottom sheet için daha fazla yer
+    zIndex: 1, // Bottom sheet'den düşük
   },
   cardHeader: {
     flexDirection: 'row',
@@ -430,10 +431,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-    zIndex: 1000,
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10, // Android için yüksek elevation
+    zIndex: 9999, // En üstte
   },
   panArea: {
     zIndex: 1,
