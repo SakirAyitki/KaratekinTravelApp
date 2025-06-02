@@ -12,13 +12,21 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AllTripsScreen from './AllTripsScreen';
 import TripDetailScreen from './TripDetailScreen';
+import PastTripsScreen from './PastTripsScreen';
+import CalendarScreen from './CalendarScreen';
 
 export default function HomeScreen() {
   const [showAllTrips, setShowAllTrips] = useState(false);
+  const [showPastTrips, setShowPastTrips] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState(null);
+  const [activeTab, setActiveTab] = useState('home');
 
   const handleTabPress = (tab: string) => {
-    console.log(`${tab} tab pressed`);
+    setActiveTab(tab);
+    // Reset other states when changing tabs
+    setShowAllTrips(false);
+    setShowPastTrips(false);
+    setSelectedTrip(null);
   };
 
   const handleShowAllTrips = () => {
@@ -27,6 +35,14 @@ export default function HomeScreen() {
 
   const handleBackFromAllTrips = () => {
     setShowAllTrips(false);
+  };
+
+  const handleShowPastTrips = () => {
+    setShowPastTrips(true);
+  };
+
+  const handleBackFromPastTrips = () => {
+    setShowPastTrips(false);
   };
 
   const handleTripPress = (trip: any) => {
@@ -41,8 +57,20 @@ export default function HomeScreen() {
     setSelectedTrip(null);
   };
 
+  const handleBackToHome = () => {
+    setActiveTab('home');
+    setShowAllTrips(false);
+    setShowPastTrips(false);
+    setSelectedTrip(null);
+  };
+
+  // Handle sub-screens that should hide navbar
   if (showAllTrips) {
     return <AllTripsScreen onBack={handleBackFromAllTrips} />;
+  }
+
+  if (showPastTrips) {
+    return <PastTripsScreen onBack={handleBackFromPastTrips} />;
   }
 
   if (selectedTrip) {
@@ -55,49 +83,60 @@ export default function HomeScreen() {
     );
   }
 
-  const currentTrips = [
-    {
-      id: 1,
-      title: 'Amasra Turu',
-      location: 'Amasra, Türkiye',
-      rating: 4.7,
-      reviewCount: 2498,
-      price: '$250/Kişi',
-      peopleCount: '+50'
-    },
-    {
-      id: 2,
-      title: 'Darıca Turu',
-      location: 'Darıca, Türkiye',
-      rating: 4.5,
-      reviewCount: 1856,
-      price: '$180/Kişi',
-      peopleCount: '+30'
-    },
-    {
-      id: 3,
-      title: 'Sapanca Turu',
-      location: 'Sapanca, Türkiye',
-      rating: 4.8,
-      reviewCount: 3247,
-      price: '$320/Kişi',
-      peopleCount: '+25'
-    },
-    {
-      id: 4,
-      title: 'Abant Turu',
-      location: 'Abant, Türkiye',
-      rating: 4.6,
-      reviewCount: 1965,
-      price: '$280/Kişi',
-      peopleCount: '+40'
+  const renderMainContent = () => {
+    if (activeTab === 'calendar') {
+      return (
+        <View style={styles.tabContent}>
+          <CalendarScreen onBack={handleBackToHome} />
+        </View>
+      );
     }
-  ];
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
+    // Default home content
+    return renderHomeContent();
+  };
+
+  const renderHomeContent = () => {
+    const currentTrips = [
+      {
+        id: 1,
+        title: 'Amasra Turu',
+        location: 'Amasra, Türkiye',
+        rating: 4.7,
+        reviewCount: 2498,
+        price: '$250/Kişi',
+        peopleCount: '+50'
+      },
+      {
+        id: 2,
+        title: 'Darıca Turu',
+        location: 'Darıca, Türkiye',
+        rating: 4.5,
+        reviewCount: 1856,
+        price: '$180/Kişi',
+        peopleCount: '+30'
+      },
+      {
+        id: 3,
+        title: 'Sapanca Turu',
+        location: 'Sapanca, Türkiye',
+        rating: 4.8,
+        reviewCount: 3247,
+        price: '$320/Kişi',
+        peopleCount: '+25'
+      },
+      {
+        id: 4,
+        title: 'Abant Turu',
+        location: 'Abant, Türkiye',
+        rating: 4.6,
+        reviewCount: 1965,
+        price: '$280/Kişi',
+        peopleCount: '+40'
+      }
+    ];
+
+    return (
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -178,7 +217,7 @@ export default function HomeScreen() {
         {/* Geçmiş Geziler */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Geçmiş Geziler</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleShowPastTrips}>
             <Text style={styles.seeAllText}>Tümü</Text>
           </TouchableOpacity>
         </View>
@@ -260,6 +299,14 @@ export default function HomeScreen() {
         </ScrollView>
 
       </ScrollView>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      
+      {renderMainContent()}
 
       {/* Bottom Tab Bar */}
       <View style={styles.tabBar}>
@@ -267,16 +314,16 @@ export default function HomeScreen() {
           style={styles.tabItem}
           onPress={() => handleTabPress('home')}
         >
-          <Ionicons name="home" size={24} color="#24BAEC" />
-          <Text style={[styles.tabText, styles.activeTabText]}>Anasayfa</Text>
+          <Ionicons name="home" size={24} color={activeTab === 'home' ? "#24BAEC" : "#999"} />
+          <Text style={[styles.tabText, activeTab === 'home' && styles.activeTabText]}>Anasayfa</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.tabItem}
           onPress={() => handleTabPress('calendar')}
         >
-          <Ionicons name="calendar-outline" size={24} color="#999" />
-          <Text style={styles.tabText}>Takvim</Text>
+          <Ionicons name="calendar-outline" size={24} color={activeTab === 'calendar' ? "#24BAEC" : "#999"} />
+          <Text style={[styles.tabText, activeTab === 'calendar' && styles.activeTabText]}>Takvim</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -290,16 +337,16 @@ export default function HomeScreen() {
           style={styles.tabItem}
           onPress={() => handleTabPress('messages')}
         >
-          <Ionicons name="chatbubble-outline" size={24} color="#999" />
-          <Text style={styles.tabText}>Mesajlar</Text>
+          <Ionicons name="chatbubble-outline" size={24} color={activeTab === 'messages' ? "#24BAEC" : "#999"} />
+          <Text style={[styles.tabText, activeTab === 'messages' && styles.activeTabText]}>Mesajlar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.tabItem}
           onPress={() => handleTabPress('profile')}
         >
-          <Ionicons name="person-outline" size={24} color="#999" />
-          <Text style={styles.tabText}>Profil</Text>
+          <Ionicons name="person-outline" size={24} color={activeTab === 'profile' ? "#24BAEC" : "#999"} />
+          <Text style={[styles.tabText, activeTab === 'profile' && styles.activeTabText]}>Profil</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -610,5 +657,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  tabContent: {
+    flex: 1,
   },
 }); 
