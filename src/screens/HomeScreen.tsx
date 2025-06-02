@@ -14,6 +14,7 @@ import AllTripsScreen from './AllTripsScreen';
 import TripDetailScreen from './TripDetailScreen';
 import PastTripsScreen from './PastTripsScreen';
 import PastTripDetailScreen from './PastTripDetailScreen';
+import ReviewsScreen from './ReviewsScreen';
 import CalendarScreen from './CalendarScreen';
 import ProgramDetailScreen from './ProgramDetailScreen';
 
@@ -24,6 +25,7 @@ export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState('home');
   const [showProgramDetail, setShowProgramDetail] = useState(false);
   const [showPastTripDetail, setShowPastTripDetail] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const [selectedProgramTrip, setSelectedProgramTrip] = useState(null);
 
   const handleTabPress = (tab: string) => {
@@ -34,6 +36,7 @@ export default function HomeScreen() {
     setSelectedTrip(null);
     setShowProgramDetail(false);
     setShowPastTripDetail(false);
+    setShowReviews(false);
     setSelectedProgramTrip(null);
   };
 
@@ -59,6 +62,18 @@ export default function HomeScreen() {
 
   const handlePastTripPress = (trip: any) => {
     setSelectedProgramTrip(trip);
+    setShowPastTrips(false);
+    setShowPastTripDetail(true);
+  };
+
+  const handleShowAllReviews = (tripData: any) => {
+    setSelectedProgramTrip(tripData);
+    setShowPastTripDetail(false);
+    setShowReviews(true);
+  };
+
+  const handleBackFromReviews = () => {
+    setShowReviews(false);
     setShowPastTripDetail(true);
   };
 
@@ -77,6 +92,7 @@ export default function HomeScreen() {
     setSelectedTrip(null);
     setShowProgramDetail(false);
     setShowPastTripDetail(false);
+    setShowReviews(false);
     setSelectedProgramTrip(null);
   };
 
@@ -93,6 +109,7 @@ export default function HomeScreen() {
   const handleBackFromPastTripDetail = () => {
     setShowPastTripDetail(false);
     setSelectedProgramTrip(null);
+    setShowPastTrips(true);
   };
 
   // Handle sub-screens that should hide navbar
@@ -128,6 +145,16 @@ export default function HomeScreen() {
     return (
       <PastTripDetailScreen 
         onBack={handleBackFromPastTripDetail}
+        tripData={selectedProgramTrip}
+        onShowAllReviews={handleShowAllReviews}
+      />
+    );
+  }
+
+  if (showReviews) {
+    return (
+      <ReviewsScreen 
+        onBack={handleBackFromReviews}
         tripData={selectedProgramTrip}
       />
     );
