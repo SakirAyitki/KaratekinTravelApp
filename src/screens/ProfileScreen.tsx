@@ -8,15 +8,45 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface ProfileScreenProps {
   onBack: () => void;
   onNavigateToProfileEdit?: () => void;
+  onNavigateToSavedTrips?: () => void;
+  onNavigateToPastTripsRating?: () => void;
+  onNavigateToSecurity?: () => void;
+  onNavigateToAbout?: () => void;
+  onLogout?: () => void;
 }
 
-export default function ProfileScreen({ onBack, onNavigateToProfileEdit }: ProfileScreenProps) {
+export default function ProfileScreen({ onBack, onNavigateToProfileEdit, onNavigateToSavedTrips, onNavigateToPastTripsRating, onNavigateToSecurity, onNavigateToAbout, onLogout }: ProfileScreenProps) {
+  const handleLogout = () => {
+    Alert.alert(
+      'Çıkış Yap',
+      'Hesabınızdan çıkmak istediğinizden emin misiniz?',
+      [
+        {
+          text: 'İptal',
+          style: 'cancel',
+        },
+        {
+          text: 'Çıkış Yap',
+          style: 'destructive',
+          onPress: () => {
+            if (onLogout) {
+              onLogout();
+            } else {
+              Alert.alert('Başarılı', 'Hesabınızdan çıkış yapıldı.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
@@ -70,7 +100,7 @@ export default function ProfileScreen({ onBack, onNavigateToProfileEdit }: Profi
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={onNavigateToSavedTrips}>
             <View style={styles.menuIconContainer}>
               <Ionicons name="bookmark-outline" size={20} color="#666" />
             </View>
@@ -78,7 +108,7 @@ export default function ProfileScreen({ onBack, onNavigateToProfileEdit }: Profi
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={onNavigateToPastTripsRating}>
             <View style={styles.menuIconContainer}>
               <Ionicons name="airplane-outline" size={20} color="#666" />
             </View>
@@ -86,7 +116,7 @@ export default function ProfileScreen({ onBack, onNavigateToProfileEdit }: Profi
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={onNavigateToSecurity}>
             <View style={styles.menuIconContainer}>
               <Ionicons name="shield-outline" size={20} color="#666" />
             </View>
@@ -94,7 +124,7 @@ export default function ProfileScreen({ onBack, onNavigateToProfileEdit }: Profi
             <Ionicons name="chevron-forward" size={20} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} onPress={onNavigateToAbout}>
             <View style={styles.menuIconContainer}>
               <Ionicons name="information-circle-outline" size={20} color="#666" />
             </View>
@@ -105,7 +135,7 @@ export default function ProfileScreen({ onBack, onNavigateToProfileEdit }: Profi
 
         {/* Logout Button */}
         <View style={styles.logoutSection}>
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutText}>Çıkış Yap</Text>
           </TouchableOpacity>
         </View>

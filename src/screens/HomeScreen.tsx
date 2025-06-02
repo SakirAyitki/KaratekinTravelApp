@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AllTripsScreen from './AllTripsScreen';
@@ -20,6 +21,12 @@ import ProgramDetailScreen from './ProgramDetailScreen';
 import ChatsScreen from './ChatsScreen';
 import ChatDetailScreen from './ChatDetailScreen';
 import ProfileScreen from './ProfileScreen';
+import ProfileEditScreen from './ProfileEditScreen';
+import SavedTripsScreen from './SavedTripsScreen';
+import PastTripsRatingScreen from './PastTripsRatingScreen';
+import SecurityScreen from './SecurityScreen';
+import AboutScreen from './AboutScreen';
+import NotificationsScreen from './NotificationsScreen';
 
 interface ChatItem {
   id: string;
@@ -30,19 +37,32 @@ interface ChatItem {
   avatar: string;
 }
 
-export default function HomeScreen() {
+interface HomeScreenProps {
+  onLogout?: () => void;
+}
+
+export default function HomeScreen({ onLogout }: HomeScreenProps) {
   const [showAllTrips, setShowAllTrips] = useState(false);
   const [showPastTrips, setShowPastTrips] = useState(false);
-  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [selectedTrip, setSelectedTrip] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('home');
   const [showProgramDetail, setShowProgramDetail] = useState(false);
   const [showPastTripDetail, setShowPastTripDetail] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [selectedProgramTrip, setSelectedProgramTrip] = useState(null);
   const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showSavedTrips, setShowSavedTrips] = useState(false);
+  const [savedTrips, setSavedTrips] = useState<any[]>([]);
+  const [navigationContext, setNavigationContext] = useState<string>('home');
+  const [showPastTripsRating, setShowPastTripsRating] = useState(false);
+  const [showSecurity, setShowSecurity] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleTabPress = (tab: string) => {
     setActiveTab(tab);
+    setNavigationContext('home');
     // Reset other states when changing tabs
     setShowAllTrips(false);
     setShowPastTrips(false);
@@ -51,6 +71,12 @@ export default function HomeScreen() {
     setShowPastTripDetail(false);
     setShowReviews(false);
     setSelectedProgramTrip(null);
+    setShowProfileEdit(false);
+    setShowSavedTrips(false);
+    setShowPastTripsRating(false);
+    setShowSecurity(false);
+    setShowAbout(false);
+    setShowNotifications(false);
   };
 
   const handleShowAllTrips = () => {
@@ -71,6 +97,7 @@ export default function HomeScreen() {
 
   const handleTripPress = (trip: any) => {
     setSelectedTrip(trip);
+    setNavigationContext('home');
   };
 
   const handlePastTripPress = (trip: any) => {
@@ -92,6 +119,9 @@ export default function HomeScreen() {
 
   const handleBackFromTripDetail = () => {
     setSelectedTrip(null);
+    if (navigationContext === 'savedTrips') {
+      setShowSavedTrips(true);
+    }
   };
 
   const handleHomeFromTripDetail = () => {
@@ -107,6 +137,12 @@ export default function HomeScreen() {
     setShowPastTripDetail(false);
     setShowReviews(false);
     setSelectedProgramTrip(null);
+    setShowProfileEdit(false);
+    setShowSavedTrips(false);
+    setShowPastTripsRating(false);
+    setShowSecurity(false);
+    setShowAbout(false);
+    setShowNotifications(false);
   };
 
   const handleShowProgramDetail = (tripData: any) => {
@@ -133,6 +169,108 @@ export default function HomeScreen() {
     setSelectedChat(chat);
   };
 
+  const handleNavigateToProfileEdit = () => {
+    setShowProfileEdit(true);
+  };
+
+  const handleBackFromProfileEdit = () => {
+    setShowProfileEdit(false);
+  };
+
+  const handleNavigateToSavedTrips = () => {
+    setShowSavedTrips(true);
+  };
+
+  const handleBackFromSavedTrips = () => {
+    setShowSavedTrips(false);
+  };
+
+  const handleTripPressFromSaved = (trip: any) => {
+    setSelectedTrip(trip);
+    setNavigationContext('savedTrips');
+    setShowSavedTrips(false);
+  };
+
+  const handleBookmarkTrip = (trip: any) => {
+    setSavedTrips(prevSavedTrips => {
+      const isAlreadySaved = prevSavedTrips.some(savedTrip => savedTrip.id === trip.id);
+      
+      if (isAlreadySaved) {
+        // Remove from saved trips
+        return prevSavedTrips.filter(savedTrip => savedTrip.id !== trip.id);
+      } else {
+        // Add to saved trips
+        return [...prevSavedTrips, {
+          ...trip,
+          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
+        }];
+      }
+    });
+  };
+
+  const isTripSaved = (tripId: number) => {
+    return savedTrips.some(savedTrip => savedTrip.id === tripId);
+  };
+
+  const handleNavigateToPastTripsRating = () => {
+    setShowPastTripsRating(true);
+  };
+
+  const handleBackFromPastTripsRating = () => {
+    setShowPastTripsRating(false);
+  };
+
+  const handleNavigateToSecurity = () => {
+    setShowSecurity(true);
+  };
+
+  const handleBackFromSecurity = () => {
+    setShowSecurity(false);
+  };
+
+  const handleNavigateToAbout = () => {
+    setShowAbout(true);
+  };
+
+  const handleBackFromAbout = () => {
+    setShowAbout(false);
+  };
+
+  const handleNavigateToNotifications = () => {
+    setShowNotifications(true);
+  };
+
+  const handleBackFromNotifications = () => {
+    setShowNotifications(false);
+  };
+
+  const handleLogout = () => {
+    // Reset all states and go back to login/welcome screen
+    setActiveTab('home');
+    setShowAllTrips(false);
+    setShowPastTrips(false);
+    setSelectedTrip(null);
+    setShowProgramDetail(false);
+    setShowPastTripDetail(false);
+    setShowReviews(false);
+    setSelectedProgramTrip(null);
+    setShowProfileEdit(false);
+    setShowSavedTrips(false);
+    setShowPastTripsRating(false);
+    setShowSecurity(false);
+    setShowAbout(false);
+    setShowNotifications(false);
+    setSavedTrips([]);
+    setNavigationContext('home');
+    
+    // Call the logout handler from App.tsx
+    if (onLogout) {
+      onLogout();
+    } else {
+      Alert.alert('Başarılı', 'Hesabınızdan başarıyla çıkış yapıldı.');
+    }
+  };
+
   // Handle sub-screens that should hide navbar
   if (showAllTrips) {
     return <AllTripsScreen onBack={handleBackFromAllTrips} />;
@@ -148,6 +286,8 @@ export default function HomeScreen() {
         onBack={handleBackFromTripDetail} 
         onHome={handleHomeFromTripDetail}
         tripData={selectedTrip} 
+        onBookmarkTrip={handleBookmarkTrip}
+        isTripSaved={isTripSaved(selectedTrip.id)}
       />
     );
   }
@@ -195,6 +335,53 @@ export default function HomeScreen() {
     );
   }
 
+  // ProfileEditScreen - navbar'sız
+  if (showProfileEdit) {
+    return (
+      <ProfileEditScreen onBack={handleBackFromProfileEdit} />
+    );
+  }
+
+  // SavedTripsScreen - navbar'sız
+  if (showSavedTrips) {
+    return (
+      <SavedTripsScreen 
+        onBack={handleBackFromSavedTrips} 
+        savedTrips={savedTrips}
+        onBookmarkTrip={handleBookmarkTrip}
+        onTripPress={handleTripPressFromSaved}
+      />
+    );
+  }
+
+  // PastTripsRatingScreen - navbar'sız
+  if (showPastTripsRating) {
+    return (
+      <PastTripsRatingScreen onBack={handleBackFromPastTripsRating} />
+    );
+  }
+
+  // SecurityScreen - navbar'sız
+  if (showSecurity) {
+    return (
+      <SecurityScreen onBack={handleBackFromSecurity} />
+    );
+  }
+
+  // AboutScreen - navbar'sız
+  if (showAbout) {
+    return (
+      <AboutScreen onBack={handleBackFromAbout} />
+    );
+  }
+
+  // NotificationsScreen - navbar'sız
+  if (showNotifications) {
+    return (
+      <NotificationsScreen onBack={handleBackFromNotifications} />
+    );
+  }
+
   const renderMainContent = () => {
     if (activeTab === 'calendar') {
       return (
@@ -218,7 +405,15 @@ export default function HomeScreen() {
     if (activeTab === 'profile') {
       return (
         <View style={styles.tabContent}>
-          <ProfileScreen onBack={handleBackToHome} />
+          <ProfileScreen 
+            onBack={handleBackToHome} 
+            onNavigateToProfileEdit={handleNavigateToProfileEdit}
+            onNavigateToSavedTrips={handleNavigateToSavedTrips}
+            onNavigateToPastTripsRating={handleNavigateToPastTripsRating}
+            onNavigateToSecurity={handleNavigateToSecurity}
+            onNavigateToAbout={handleNavigateToAbout}
+            onLogout={handleLogout}
+          />
         </View>
       );
     }
@@ -279,7 +474,7 @@ export default function HomeScreen() {
             />
             <Text style={styles.userName}>Şakir</Text>
           </View>
-          <TouchableOpacity style={styles.notificationButton}>
+          <TouchableOpacity style={styles.notificationButton} onPress={handleNavigateToNotifications}>
             <Ionicons name="notifications-outline" size={24} color="#333" />
           </TouchableOpacity>
         </View>
@@ -314,8 +509,15 @@ export default function HomeScreen() {
                   source={require('../../assets/ob1.png')} 
                   style={styles.cardImage}
                 />
-                <TouchableOpacity style={styles.bookmarkButton}>
-                  <Ionicons name="bookmark-outline" size={20} color="white" />
+                <TouchableOpacity 
+                  style={styles.bookmarkButton}
+                  onPress={() => handleBookmarkTrip(trip)}
+                >
+                  <Ionicons 
+                    name={isTripSaved(trip.id) ? "bookmark" : "bookmark-outline"} 
+                    size={20} 
+                    color="white" 
+                  />
                 </TouchableOpacity>
               </View>
               <View style={styles.cardContent}>

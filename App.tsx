@@ -61,6 +61,10 @@ export default function App() {
     }
   }, []);
 
+  const handleLogout = useCallback(() => {
+    setCurrentScreen('login');
+  }, []);
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'login':
@@ -99,7 +103,7 @@ export default function App() {
           />
         );
       case 'home':
-        return <HomeScreen />;
+        return <HomeScreen onLogout={handleLogout} />;
       case 'loading':
         return <View style={styles.loadingContainer} />;
       case 'splash':
@@ -107,7 +111,7 @@ export default function App() {
       case 'onboarding':
         return <OnboardingScreen onComplete={handleOnboardingComplete} />;
       default:
-        return <HomeScreen />;
+        return <HomeScreen onLogout={handleLogout} />;
     }
   };
 

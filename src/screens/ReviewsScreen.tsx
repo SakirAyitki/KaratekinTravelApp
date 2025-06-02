@@ -33,7 +33,7 @@ export default function ReviewsScreen({ onBack, tripData }: ReviewsScreenProps) 
   const reviews: Review[] = [
     {
       id: 1,
-      userName: 'Tunahan KORKMAZ',
+      userName: 'Şakir Ayıtkı',
       userAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face&auto=format',
       rating: 5,
       date: '2 gün önce',
@@ -175,7 +175,11 @@ export default function ReviewsScreen({ onBack, tripData }: ReviewsScreenProps) 
           </View>
           
           <View style={styles.ratingsBreakdown}>
-            {[5, 4, 3, 2, 1].map(stars => renderRatingBar(stars, ratingCounts[stars as keyof typeof ratingCounts]))}
+            {[5, 4, 3, 2, 1].map(stars => (
+              <View key={stars}>
+                {renderRatingBar(stars, ratingCounts[stars as keyof typeof ratingCounts])}
+              </View>
+            ))}
           </View>
         </View>
 

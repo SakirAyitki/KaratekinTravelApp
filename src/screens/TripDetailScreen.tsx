@@ -18,15 +18,24 @@ interface TripDetailScreenProps {
   onBack: () => void;
   onHome?: () => void;
   tripData?: {
+    id: number;
     title: string;
     location: string;
     rating: number;
     reviewCount: number;
     price: string;
   };
+  onBookmarkTrip?: (trip: any) => void;
+  isTripSaved?: boolean;
 }
 
-export default function TripDetailScreen({ onBack, onHome, tripData }: TripDetailScreenProps) {
+export default function TripDetailScreen({ 
+  onBack, 
+  onHome, 
+  tripData,
+  onBookmarkTrip,
+  isTripSaved = false
+}: TripDetailScreenProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showRoute, setShowRoute] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
@@ -95,8 +104,15 @@ export default function TripDetailScreen({ onBack, onHome, tripData }: TripDetai
                 <Ionicons name="chevron-back" size={24} color="white" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Gezi Detayları</Text>
-              <TouchableOpacity style={styles.bookmarkButton}>
-                <Ionicons name="bookmark-outline" size={24} color="white" />
+              <TouchableOpacity 
+                style={styles.bookmarkButton}
+                onPress={() => onBookmarkTrip && tripData && onBookmarkTrip(tripData)}
+              >
+                <Ionicons 
+                  name={isTripSaved ? "bookmark" : "bookmark-outline"} 
+                  size={24} 
+                  color="white" 
+                />
               </TouchableOpacity>
             </View>
           </View>

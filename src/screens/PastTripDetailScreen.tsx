@@ -265,7 +265,7 @@ export default function PastTripDetailScreen({ onBack, tripData, onShowAllReview
                   style={styles.reviewAvatar} 
                 />
                 <View style={styles.reviewInfo}>
-                  <Text style={styles.reviewerName}>Tunahan KORKMAZ</Text>
+                  <Text style={styles.reviewerName}>Şakir Ayıtkı</Text>
                   <View style={styles.reviewStars}>
                     {[...Array(5)].map((_, index) => (
                       <Ionicons key={index} name="star" size={14} color="#FFD700" />
