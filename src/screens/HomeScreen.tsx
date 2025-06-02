@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AllTripsScreen from './AllTripsScreen';
 import TripDetailScreen from './TripDetailScreen';
 import PastTripsScreen from './PastTripsScreen';
+import PastTripDetailScreen from './PastTripDetailScreen';
 import CalendarScreen from './CalendarScreen';
 import ProgramDetailScreen from './ProgramDetailScreen';
 
@@ -22,6 +23,7 @@ export default function HomeScreen() {
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
   const [showProgramDetail, setShowProgramDetail] = useState(false);
+  const [showPastTripDetail, setShowPastTripDetail] = useState(false);
   const [selectedProgramTrip, setSelectedProgramTrip] = useState(null);
 
   const handleTabPress = (tab: string) => {
@@ -31,6 +33,7 @@ export default function HomeScreen() {
     setShowPastTrips(false);
     setSelectedTrip(null);
     setShowProgramDetail(false);
+    setShowPastTripDetail(false);
     setSelectedProgramTrip(null);
   };
 
@@ -54,6 +57,11 @@ export default function HomeScreen() {
     setSelectedTrip(trip);
   };
 
+  const handlePastTripPress = (trip: any) => {
+    setSelectedProgramTrip(trip);
+    setShowPastTripDetail(true);
+  };
+
   const handleBackFromTripDetail = () => {
     setSelectedTrip(null);
   };
@@ -68,6 +76,7 @@ export default function HomeScreen() {
     setShowPastTrips(false);
     setSelectedTrip(null);
     setShowProgramDetail(false);
+    setShowPastTripDetail(false);
     setSelectedProgramTrip(null);
   };
 
@@ -81,13 +90,18 @@ export default function HomeScreen() {
     setSelectedProgramTrip(null);
   };
 
+  const handleBackFromPastTripDetail = () => {
+    setShowPastTripDetail(false);
+    setSelectedProgramTrip(null);
+  };
+
   // Handle sub-screens that should hide navbar
   if (showAllTrips) {
     return <AllTripsScreen onBack={handleBackFromAllTrips} />;
   }
 
   if (showPastTrips) {
-    return <PastTripsScreen onBack={handleBackFromPastTrips} />;
+    return <PastTripsScreen onBack={handleBackFromPastTrips} onTripPress={handlePastTripPress} />;
   }
 
   if (selectedTrip) {
@@ -105,6 +119,15 @@ export default function HomeScreen() {
     return (
       <ProgramDetailScreen 
         onBack={handleBackFromProgramDetail}
+        tripData={selectedProgramTrip}
+      />
+    );
+  }
+
+  if (showPastTripDetail) {
+    return (
+      <PastTripDetailScreen 
+        onBack={handleBackFromPastTripDetail}
         tripData={selectedProgramTrip}
       />
     );
@@ -266,8 +289,8 @@ export default function HomeScreen() {
               rating: 4.7,
               reviewCount: 2498,
               price: '$250/Kişi',
-              date: '26 Ekim 2025',
-              fullLocation: 'Amasra o Kastamonu',
+              date: '26 Ekim 2024',
+              fullLocation: 'Amasra, Kastamonu',
               status: 'Tamamlandı'
             },
             {
@@ -277,7 +300,7 @@ export default function HomeScreen() {
               rating: 4.8,
               reviewCount: 3247,
               price: '$320/Kişi',
-              date: '15 Ekim 2025',
+              date: '15 Ekim 2024',
               fullLocation: 'Sapanca, Sakarya',
               status: 'Tamamlandı'
             },
@@ -288,7 +311,7 @@ export default function HomeScreen() {
               rating: 4.6,
               reviewCount: 1965,
               price: '$280/Kişi',
-              date: '8 Ekim 2025',
+              date: '8 Ekim 2024',
               fullLocation: 'Bolu Merkez',
               status: 'Tamamlandı'
             },
@@ -299,12 +322,12 @@ export default function HomeScreen() {
               rating: 4.5,
               reviewCount: 1856,
               price: '$180/Kişi',
-              date: '1 Ekim 2025',
+              date: '1 Ekim 2024',
               fullLocation: 'Darıca, Kocaeli',
               status: 'Tamamlandı'
             }
           ].map((trip) => (
-            <TouchableOpacity key={trip.id} style={styles.pastTripCard} onPress={() => handleTripPress(trip)}>
+            <TouchableOpacity key={trip.id} style={styles.pastTripCard} onPress={() => handlePastTripPress(trip)}>
               <Image 
                 source={require('../../assets/ob2.png')} 
                 style={styles.pastTripCardImage}

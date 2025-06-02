@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 interface PastTripsScreenProps {
   onBack: () => void;
+  onTripPress?: (trip: Trip) => void;
 }
 
 interface Trip {
@@ -37,12 +38,11 @@ interface FilterOptions {
   sortBy: string;
 }
 
-export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
+export default function PastTripsScreen({ onBack, onTripPress }: PastTripsScreenProps) {
   const [searchText, setSearchText] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('En Çok Beğenilen');
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    categories: [],
+    categories: ['Tümü'],
     priceRange: { min: 0, max: 1000 },
     rating: 0,
     sortBy: 'En Çok Beğenilen',
@@ -51,68 +51,46 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
   const pastTrips: Trip[] = [
     {
       id: 1,
-      title: 'Niladri Reservoir',
-      location: 'Tekergat, Sunamgnj',
-      rating: 4,
-      image: require('../../assets/ob1.png'),
+      title: 'Amasra Turu',
+      location: 'Amasra, Kastamonu',
+      rating: 4.7,
+      image: require('../../assets/ob2.png'),
       date: '2024-10-26',
-      price: 450,
-      reviewCount: 1250,
-      category: 'Doğa',
+      price: 250,
+      reviewCount: 2498,
+      category: 'Tatil',
     },
     {
       id: 2,
-      title: 'Casa Las Tirtugas',
-      location: 'Av Damero, Mexico',
-      rating: 4,
-      image: require('../../assets/ob2.png'),
-      date: '2024-10-15',
-      price: 680,
-      reviewCount: 2100,
-      category: 'Kültür',
-    },
-    {
-      id: 3,
-      title: 'Aonang Villa Resort',
-      location: 'Bastola, Islampur',
-      rating: 4,
-      image: require('../../assets/ob3.png'),
-      date: '2024-09-20',
-      price: 520,
-      reviewCount: 890,
-      category: 'Tatil',
-    },
-    {
-      id: 4,
-      title: 'Rangauti Resort',
-      location: 'Sylhet, Airport Road',
-      rating: 4,
+      title: 'Sapanca Turu',
+      location: 'Sapanca, Sakarya',
+      rating: 4.8,
       image: require('../../assets/ob1.png'),
-      date: '2024-09-10',
-      price: 380,
-      reviewCount: 1560,
-      category: 'Tatil',
-    },
-    {
-      id: 5,
-      title: 'Kachura Resort',
-      location: 'Vellima, Island',
-      rating: 4,
-      image: require('../../assets/ob2.png'),
-      date: '2024-08-25',
-      price: 720,
-      reviewCount: 980,
+      date: '2024-10-15',
+      price: 320,
+      reviewCount: 3247,
       category: 'Doğa',
     },
     {
-      id: 6,
-      title: 'Shakardu Resort',
-      location: 'Shakartu, Pakistan',
-      rating: 4,
+      id: 3,
+      title: 'Bolu Turu',
+      location: 'Bolu Merkez',
+      rating: 4.6,
       image: require('../../assets/ob3.png'),
-      date: '2024-08-12',
-      price: 290,
-      reviewCount: 1780,
+      date: '2024-10-08',
+      price: 280,
+      reviewCount: 1965,
+      category: 'Doğa',
+    },
+    {
+      id: 4,
+      title: 'Darıca Turu',
+      location: 'Darıca, Kocaeli',
+      rating: 4.5,
+      image: require('../../assets/ob2.png'),
+      date: '2024-10-01',
+      price: 180,
+      reviewCount: 1856,
       category: 'Kültür',
     },
   ];
@@ -128,9 +106,11 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
 
   const getFilteredTrips = () => {
     let filtered = pastTrips.filter(trip => {
-      // Text search
-      const matchesSearch = trip.title.toLowerCase().includes(searchText.toLowerCase()) ||
-                          trip.location.toLowerCase().includes(searchText.toLowerCase());
+      // Text search - improved with trimming and better character handling
+      const searchTerm = searchText.toLowerCase().trim();
+      const matchesSearch = searchTerm === '' || 
+                          trip.title.toLowerCase().includes(searchTerm) ||
+                          trip.location.toLowerCase().includes(searchTerm);
       
       // Category filter
       const matchesCategory = filterOptions.categories.length === 0 || 
@@ -165,22 +145,22 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
     }
   };
 
-  const handleFilterPress = () => {
-    setShowFilterModal(true);
+  const handleQuickFilterPress = (filter: string) => {
+    setFilterOptions(prev => ({ ...prev, sortBy: filter }));
   };
 
   const handleApplyFilters = () => {
-    setSelectedFilter(filterOptions.sortBy);
     setShowFilterModal(false);
   };
 
   const handleResetFilters = () => {
     setFilterOptions({
-      categories: [],
+      categories: ['Tümü'],
       priceRange: { min: 0, max: 1000 },
       rating: 0,
       sortBy: 'En Çok Beğenilen',
     });
+    setSearchText('');
   };
 
   const toggleCategory = (category: string) => {
@@ -212,7 +192,7 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
   };
 
   const renderTripCard = ({ item }: { item: Trip }) => (
-    <TouchableOpacity style={styles.tripCard}>
+    <TouchableOpacity style={styles.tripCard} onPress={() => onTripPress?.(item)}>
       <Image source={item.image} style={styles.tripImage} />
       <View style={styles.tripInfo}>
         <View style={styles.ratingBadge}>
@@ -231,6 +211,14 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
       </View>
     </TouchableOpacity>
   );
+
+  const hasActiveFilters = () => {
+    return !filterOptions.categories.includes('Tümü') && filterOptions.categories.length > 0 ||
+           filterOptions.priceRange.min !== 0 || filterOptions.priceRange.max !== 1000 ||
+           filterOptions.rating !== 0 ||
+           filterOptions.sortBy !== 'En Çok Beğenilen' ||
+           searchText.trim() !== '';
+  };
 
   const renderFilterModal = () => (
     <Modal
@@ -352,8 +340,14 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
           </ScrollView>
 
           <View style={styles.modalFooter}>
-            <TouchableOpacity style={styles.resetButton} onPress={handleResetFilters}>
-              <Text style={styles.resetButtonText}>Sıfırla</Text>
+            <TouchableOpacity 
+              style={[styles.resetButton, !hasActiveFilters() && styles.disabledButton]} 
+              onPress={handleResetFilters}
+              disabled={!hasActiveFilters()}
+            >
+              <Text style={[styles.resetButtonText, !hasActiveFilters() && styles.disabledButtonText]}>
+                Sıfırla
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
               <Text style={styles.applyButtonText}>Uygula</Text>
@@ -391,7 +385,7 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
             onChangeText={setSearchText}
           />
         </View>
-        <TouchableOpacity style={styles.filterButton} onPress={handleFilterPress}>
+        <TouchableOpacity style={styles.filterButton} onPress={() => setShowFilterModal(true)}>
           <Ionicons name="funnel-outline" size={20} color="#333" />
         </TouchableOpacity>
       </View>
@@ -408,13 +402,13 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
             key={filter}
             style={[
               styles.filterChip, 
-              selectedFilter === filter && styles.activeFilterChip
+              filterOptions.sortBy === filter && styles.activeFilterChip
             ]}
-            onPress={() => setSelectedFilter(filter)}
+            onPress={() => handleQuickFilterPress(filter)}
           >
             <Text style={[
               styles.filterText, 
-              selectedFilter === filter && styles.activeFilterText
+              filterOptions.sortBy === filter && styles.activeFilterText
             ]}>
               {filter}
             </Text>
@@ -427,10 +421,10 @@ export default function PastTripsScreen({ onBack }: PastTripsScreenProps) {
         <Text style={styles.resultsText}>
           {filteredTrips.length} gezi bulundu
         </Text>
-        {selectedFilter !== 'En Çok Beğenilen' && (
+        {filterOptions.sortBy !== 'En Çok Beğenilen' && (
           <Text style={styles.sortedByText}>
-            {selectedFilter === 'Tarihe Göre Sırala' ? 'Tarihe göre sıralandı' : 
-             selectedFilter === 'Fiyata Göre' ? 'Fiyata göre sıralandı' : ''}
+            {filterOptions.sortBy === 'Tarihe Göre Sırala' ? 'Tarihe göre sıralandı' : 
+             filterOptions.sortBy === 'Fiyata Göre' ? 'Fiyata göre sıralandı' : ''}
           </Text>
         )}
       </View>
@@ -755,5 +749,11 @@ const styles = StyleSheet.create({
   },
   activeRatingButtonText: {
     color: 'white',
+  },
+  disabledButton: {
+    backgroundColor: '#999',
+  },
+  disabledButtonText: {
+    color: '#666',
   },
 }); 
