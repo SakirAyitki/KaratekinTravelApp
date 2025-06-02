@@ -19,6 +19,7 @@ import CalendarScreen from './CalendarScreen';
 import ProgramDetailScreen from './ProgramDetailScreen';
 import ChatsScreen from './ChatsScreen';
 import ChatDetailScreen from './ChatDetailScreen';
+import ProfileScreen from './ProfileScreen';
 
 interface ChatItem {
   id: string;
@@ -210,6 +211,14 @@ export default function HomeScreen() {
       return (
         <View style={styles.tabContent}>
           <ChatsScreen onBack={handleBackToHome} onChatPress={handleChatPress} />
+        </View>
+      );
+    }
+
+    if (activeTab === 'profile') {
+      return (
+        <View style={styles.tabContent}>
+          <ProfileScreen onBack={handleBackToHome} />
         </View>
       );
     }
