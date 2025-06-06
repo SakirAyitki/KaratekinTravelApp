@@ -27,6 +27,8 @@ import PastTripsRatingScreen from './PastTripsRatingScreen';
 import SecurityScreen from './SecurityScreen';
 import AboutScreen from './AboutScreen';
 import NotificationsScreen from './NotificationsScreen';
+import SearchScreen from './SearchScreen';
+import CompanyDetailScreen from './CompanyDetailScreen';
 
 interface ChatItem {
   id: string;
@@ -49,7 +51,7 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
   const [showProgramDetail, setShowProgramDetail] = useState(false);
   const [showPastTripDetail, setShowPastTripDetail] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
-  const [selectedProgramTrip, setSelectedProgramTrip] = useState(null);
+  const [selectedProgramTrip, setSelectedProgramTrip] = useState<any>(null);
   const [selectedChat, setSelectedChat] = useState<ChatItem | null>(null);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [showSavedTrips, setShowSavedTrips] = useState(false);
@@ -59,6 +61,8 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
   const [showSecurity, setShowSecurity] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+
 
   const handleTabPress = (tab: string) => {
     setActiveTab(tab);
@@ -77,10 +81,19 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     setShowSecurity(false);
     setShowAbout(false);
     setShowNotifications(false);
+    setSelectedCompany(null);
   };
 
   const handleShowAllTrips = () => {
     setShowAllTrips(true);
+  };
+
+  const handleShowSearch = () => {
+    setActiveTab('search');
+  };
+
+  const handleBackFromSearch = () => {
+    setActiveTab('home');
   };
 
   const handleBackFromAllTrips = () => {
@@ -121,6 +134,8 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     setSelectedTrip(null);
     if (navigationContext === 'savedTrips') {
       setShowSavedTrips(true);
+    } else if (navigationContext === 'companyDetail') {
+      setSelectedCompany(selectedCompany);
     }
   };
 
@@ -143,6 +158,7 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     setShowSecurity(false);
     setShowAbout(false);
     setShowNotifications(false);
+    setSelectedCompany(null);
   };
 
   const handleShowProgramDetail = (tripData: any) => {
@@ -158,7 +174,11 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
   const handleBackFromPastTripDetail = () => {
     setShowPastTripDetail(false);
     setSelectedProgramTrip(null);
-    setShowPastTrips(true);
+    if (navigationContext === 'companyDetail') {
+      setSelectedCompany(selectedCompany);
+    } else {
+      setShowPastTrips(true);
+    }
   };
 
   const handleBackFromChatDetail = () => {
@@ -242,6 +262,35 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
 
   const handleBackFromNotifications = () => {
     setShowNotifications(false);
+  };
+
+  const handleBackFromCompanyDetail = () => {
+    setSelectedCompany(null);
+  };
+
+  const handleTripPressFromCompany = (tripId: number, isPast: boolean) => {
+    if (isPast) {
+      // Geçmiş gezi için PastTripDetailScreen'e yönlendir
+      const trip = { 
+        id: tripId, 
+        title: 'Amasra Turu',
+        location: 'Amasra, Türkiye',
+        isPast: true
+      };
+      setNavigationContext('companyDetail');
+      setSelectedProgramTrip(trip);
+      setShowPastTripDetail(true);
+    } else {
+      // Güncel gezi için TripDetailScreen'e yönlendir
+      const trip = { 
+        id: tripId, 
+        title: 'Amasra Turu',
+        location: 'Amasra, Türkiye',
+        isPast: false
+      };
+      setNavigationContext('companyDetail');
+      setSelectedTrip(trip);
+    }
   };
 
   const handleLogout = () => {
@@ -382,6 +431,21 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     );
   }
 
+  // CompanyDetailScreen - navbar'sız
+  if (selectedCompany) {
+    return (
+      <CompanyDetailScreen 
+        onBack={handleBackFromCompanyDetail} 
+        companyName={selectedCompany}
+        onTripPress={handleTripPressFromCompany}
+        onBookmarkTrip={handleBookmarkTrip}
+        isTripSaved={isTripSaved}
+      />
+    );
+  }
+
+
+
   const renderMainContent = () => {
     if (activeTab === 'calendar') {
       return (
@@ -389,6 +453,24 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
           <CalendarScreen 
             onBack={handleBackToHome}
             onShowProgramDetail={handleShowProgramDetail}
+          />
+        </View>
+      );
+    }
+
+    if (activeTab === 'search') {
+      return (
+        <View style={styles.tabContent}>
+          <SearchScreen 
+            onBack={handleBackToHome} 
+            onTripPress={(tripId) => {
+              // Convert tripId to trip object for handleTripPress
+              const trip = { id: tripId, title: 'Amasra Turu (Default)' };
+              handleTripPress(trip);
+            }}
+            onCompanyPress={(companyName) => {
+              setSelectedCompany(companyName);
+            }}
           />
         </View>
       );
@@ -661,7 +743,7 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
 
         <TouchableOpacity 
           style={styles.centerButton}
-          onPress={handleShowAllTrips}
+          onPress={handleShowSearch}
         >
           <Ionicons name="search" size={28} color="white" />
         </TouchableOpacity>
