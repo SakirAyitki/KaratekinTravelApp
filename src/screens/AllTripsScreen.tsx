@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TripDetailScreen from './TripDetailScreen';
+import FilterModal from '../components/FilterModal';
 
 interface AllTripsScreenProps {
   onBack: () => void;
@@ -24,11 +25,7 @@ export default function AllTripsScreen({ onBack }: AllTripsScreenProps) {
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState('Tümü');
-  const [selectedPriceRange, setSelectedPriceRange] = useState('Tümü');
-  const [selectedRating, setSelectedRating] = useState('Tümü');
-  const [selectedSorting, setSelectedSorting] = useState('En Çok Beğenilen');
+  // Filter states - these will now be managed by FilterModal
 
   const allTripsData = [
     {
@@ -122,15 +119,10 @@ export default function AllTripsScreen({ onBack }: AllTripsScreenProps) {
     setShowFilterModal(false);
   };
 
-  const handleResetFilters = () => {
-    setSelectedCategory('Tümü');
-    setSelectedPriceRange('Tümü');
-    setSelectedRating('Tümü');
-    setSelectedSorting('En Çok Beğenilen');
-  };
 
-  const handleApplyFilters = () => {
-    setSelectedFilter(selectedSorting);
+
+  const handleApplyFilters = (filters: any) => {
+    console.log('Applied filters:', filters);
     setShowFilterModal(false);
   };
 
@@ -253,134 +245,11 @@ export default function AllTripsScreen({ onBack }: AllTripsScreenProps) {
         )}
       </ScrollView>
 
-      {showFilterModal && (
-        <Modal
-          visible={showFilterModal}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={handleCloseFilter}
-        >
-          <View style={styles.filterModal}>
-            <View style={styles.filterModalContent}>
-              {/* Header */}
-              <View style={styles.filterModalHeader}>
-                <Text style={styles.filterModalTitle}>Filtreler</Text>
-                <TouchableOpacity style={styles.closeButton} onPress={handleCloseFilter}>
-                  <Ionicons name="close" size={24} color="#333" />
-                </TouchableOpacity>
-              </View>
-
-              <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Kategori */}
-                <View style={styles.filterSection}>
-                  <Text style={styles.filterSectionTitle}>Kategori</Text>
-                  <View style={styles.filterOptionsRow}>
-                    {['Tümü', 'Doğa', 'Kültür', 'Tatil'].map((category) => (
-                      <TouchableOpacity
-                        key={category}
-                        style={[
-                          styles.filterOption,
-                          selectedCategory === category && styles.activeFilterOption
-                        ]}
-                        onPress={() => setSelectedCategory(category)}
-                      >
-                        <Text style={[
-                          styles.filterOptionText,
-                          selectedCategory === category && styles.activeFilterOptionText
-                        ]}>
-                          {category}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Fiyat Aralığı */}
-                <View style={styles.filterSection}>
-                  <Text style={styles.filterSectionTitle}>Fiyat Aralığı</Text>
-                  <View style={styles.filterOptionsRow}>
-                    {['Tümü', '$200-400', '$400-600', '$600+'].map((price) => (
-                      <TouchableOpacity
-                        key={price}
-                        style={[
-                          styles.filterOption,
-                          selectedPriceRange === price && styles.activeFilterOption
-                        ]}
-                        onPress={() => setSelectedPriceRange(price)}
-                      >
-                        <Text style={[
-                          styles.filterOptionText,
-                          selectedPriceRange === price && styles.activeFilterOptionText
-                        ]}>
-                          {price}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Minimum Puan */}
-                <View style={styles.filterSection}>
-                  <Text style={styles.filterSectionTitle}>Minimum Puan</Text>
-                  <View style={styles.filterOptionsRow}>
-                    {['Tümü', '1+⭐', '2+⭐', '3+⭐', '4+⭐'].map((rating) => (
-                      <TouchableOpacity
-                        key={rating}
-                        style={[
-                          styles.filterOption,
-                          selectedRating === rating && styles.activeFilterOption
-                        ]}
-                        onPress={() => setSelectedRating(rating)}
-                      >
-                        <Text style={[
-                          styles.filterOptionText,
-                          selectedRating === rating && styles.activeFilterOptionText
-                        ]}>
-                          {rating}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                {/* Sıralama */}
-                <View style={styles.filterSection}>
-                  <Text style={styles.filterSectionTitle}>Sıralama</Text>
-                  <View style={styles.filterOptionsColumn}>
-                    {['En Çok Beğenilen', 'Tarihe Göre Sırala', 'Fiyata Göre'].map((sorting) => (
-                      <TouchableOpacity
-                        key={sorting}
-                        style={[
-                          styles.filterOptionFull,
-                          selectedSorting === sorting && styles.activeFilterOptionFull
-                        ]}
-                        onPress={() => setSelectedSorting(sorting)}
-                      >
-                        <Text style={[
-                          styles.filterOptionText,
-                          selectedSorting === sorting && styles.activeFilterOptionText
-                        ]}>
-                          {sorting}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              </ScrollView>
-
-              {/* Buttons */}
-              <View style={styles.filterModalButtons}>
-                <TouchableOpacity style={styles.resetButton} onPress={handleResetFilters}>
-                  <Text style={styles.resetButtonText}>Sıfırla</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
-                  <Text style={styles.applyButtonText}>Uygula</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      )}
+      <FilterModal
+        visible={showFilterModal}
+        onClose={handleCloseFilter}
+        onApplyFilter={handleApplyFilters}
+      />
     </SafeAreaView>
   );
 }
@@ -607,111 +476,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  filterModal: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  filterModalContent: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 24,
-    maxHeight: '85%',
-  },
-  closeButton: {
-    padding: 0,
-  },
-  filterModalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-  },
-  filterModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  filterSection: {
-    marginBottom: 24,
-  },
-  filterSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
-  },
-  filterOptionsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  },
-  filterOption: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  activeFilterOption: {
-    backgroundColor: '#333',
-  },
-  filterOptionText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  activeFilterOptionText: {
-    color: 'white',
-  },
-  filterOptionsColumn: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-  },
-  filterOptionFull: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 8,
-    width: '100%',
-  },
-  activeFilterOptionFull: {
-    backgroundColor: '#333',
-  },
-  filterModalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-    gap: 12,
-  },
-  resetButton: {
-    backgroundColor: '#E5E5E5',
-    borderRadius: 25,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    flex: 1,
-    alignItems: 'center',
-  },
-  resetButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  applyButton: {
-    backgroundColor: '#FF6B35',
-    borderRadius: 25,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    flex: 1,
-    alignItems: 'center',
-  },
-  applyButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
+
 }); 

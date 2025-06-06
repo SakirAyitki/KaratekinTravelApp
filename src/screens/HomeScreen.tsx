@@ -29,6 +29,8 @@ import AboutScreen from './AboutScreen';
 import NotificationsScreen from './NotificationsScreen';
 import SearchScreen from './SearchScreen';
 import CompanyDetailScreen from './CompanyDetailScreen';
+import CompanyContactScreen from './CompanyContactScreen';
+import BusInfoScreen from './BusInfoScreen';
 
 interface ChatItem {
   id: string;
@@ -62,6 +64,8 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
   const [showAbout, setShowAbout] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [showCompanyContact, setShowCompanyContact] = useState(false);
+  const [showBusInfo, setShowBusInfo] = useState(false);
 
 
   const handleTabPress = (tab: string) => {
@@ -82,6 +86,8 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     setShowAbout(false);
     setShowNotifications(false);
     setSelectedCompany(null);
+    setShowCompanyContact(false);
+    setShowBusInfo(false);
   };
 
   const handleShowAllTrips = () => {
@@ -159,6 +165,8 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     setShowAbout(false);
     setShowNotifications(false);
     setSelectedCompany(null);
+    setShowCompanyContact(false);
+    setShowBusInfo(false);
   };
 
   const handleShowProgramDetail = (tripData: any) => {
@@ -266,6 +274,23 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
 
   const handleBackFromCompanyDetail = () => {
     setSelectedCompany(null);
+    setShowCompanyContact(false);
+  };
+
+  const handleShowCompanyContact = () => {
+    setShowCompanyContact(true);
+  };
+
+  const handleBackFromCompanyContact = () => {
+    setShowCompanyContact(false);
+  };
+
+  const handleShowBusInfo = () => {
+    setShowBusInfo(true);
+  };
+
+  const handleBackFromBusInfo = () => {
+    setShowBusInfo(false);
   };
 
   const handleTripPressFromCompany = (tripId: number, isPast: boolean) => {
@@ -431,6 +456,26 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
     );
   }
 
+  // CompanyContactScreen - navbar'sız
+  if (showCompanyContact) {
+    return (
+      <CompanyContactScreen 
+        onBack={handleBackFromCompanyContact} 
+        companyName={selectedCompany || 'Kamil Koç'}
+      />
+    );
+  }
+
+  // BusInfoScreen - navbar'sız
+  if (showBusInfo) {
+    return (
+      <BusInfoScreen 
+        onBack={handleBackFromBusInfo} 
+        companyName={selectedCompany || 'Kamil Koç'}
+      />
+    );
+  }
+
   // CompanyDetailScreen - navbar'sız
   if (selectedCompany) {
     return (
@@ -440,6 +485,8 @@ export default function HomeScreen({ onLogout }: HomeScreenProps) {
         onTripPress={handleTripPressFromCompany}
         onBookmarkTrip={handleBookmarkTrip}
         isTripSaved={isTripSaved}
+        onContactPress={handleShowCompanyContact}
+        onBusInfoPress={handleShowBusInfo}
       />
     );
   }

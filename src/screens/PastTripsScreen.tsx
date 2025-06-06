@@ -13,6 +13,7 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import FilterModal from '../components/FilterModal';
 
 interface PastTripsScreenProps {
   onBack: () => void;
@@ -149,7 +150,8 @@ export default function PastTripsScreen({ onBack, onTripPress }: PastTripsScreen
     setFilterOptions(prev => ({ ...prev, sortBy: filter }));
   };
 
-  const handleApplyFilters = () => {
+  const handleApplyFilters = (filters: any) => {
+    console.log('Applied filters:', filters);
     setShowFilterModal(false);
   };
 
@@ -163,18 +165,7 @@ export default function PastTripsScreen({ onBack, onTripPress }: PastTripsScreen
     setSearchText('');
   };
 
-  const toggleCategory = (category: string) => {
-    if (category === 'Tümü') {
-      setFilterOptions(prev => ({ ...prev, categories: ['Tümü'] }));
-    } else {
-      setFilterOptions(prev => {
-        const newCategories = prev.categories.includes(category)
-          ? prev.categories.filter(c => c !== category)
-          : [...prev.categories.filter(c => c !== 'Tümü'), category];
-        return { ...prev, categories: newCategories };
-      });
-    }
-  };
+
 
   const renderStars = (rating: number) => {
     return (
@@ -220,143 +211,7 @@ export default function PastTripsScreen({ onBack, onTripPress }: PastTripsScreen
            searchText.trim() !== '';
   };
 
-  const renderFilterModal = () => (
-    <Modal
-      visible={showFilterModal}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setShowFilterModal(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Filtreler</Text>
-            <TouchableOpacity onPress={() => setShowFilterModal(false)}>
-              <Ionicons name="close" size={24} color="#333" />
-            </TouchableOpacity>
-          </View>
 
-          <ScrollView style={styles.modalScrollView}>
-            {/* Categories */}
-            <View style={styles.filterSection}>
-              <Text style={styles.filterSectionTitle}>Kategori</Text>
-              <View style={styles.filterChipsContainer}>
-                {categories.map((category) => (
-                  <TouchableOpacity
-                    key={category}
-                    style={[
-                      styles.filterModalChip,
-                      filterOptions.categories.includes(category) && styles.activeFilterModalChip
-                    ]}
-                    onPress={() => toggleCategory(category)}
-                  >
-                    <Text style={[
-                      styles.filterModalChipText,
-                      filterOptions.categories.includes(category) && styles.activeFilterModalChipText
-                    ]}>
-                      {category}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Price Range */}
-            <View style={styles.filterSection}>
-              <Text style={styles.filterSectionTitle}>Fiyat Aralığı</Text>
-              <View style={styles.filterChipsContainer}>
-                {priceRanges.map((range) => (
-                  <TouchableOpacity
-                    key={range.label}
-                    style={[
-                      styles.filterModalChip,
-                      filterOptions.priceRange.min === range.min && 
-                      filterOptions.priceRange.max === range.max && styles.activeFilterModalChip
-                    ]}
-                    onPress={() => setFilterOptions(prev => ({ 
-                      ...prev, 
-                      priceRange: { min: range.min, max: range.max } 
-                    }))}
-                  >
-                    <Text style={[
-                      styles.filterModalChipText,
-                      filterOptions.priceRange.min === range.min && 
-                      filterOptions.priceRange.max === range.max && styles.activeFilterModalChipText
-                    ]}>
-                      {range.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Rating */}
-            <View style={styles.filterSection}>
-              <Text style={styles.filterSectionTitle}>Minimum Puan</Text>
-              <View style={styles.ratingContainer}>
-                {[0, 1, 2, 3, 4].map((rating) => (
-                  <TouchableOpacity
-                    key={rating}
-                    style={[
-                      styles.ratingButton,
-                      filterOptions.rating === rating && styles.activeRatingButton
-                    ]}
-                    onPress={() => setFilterOptions(prev => ({ ...prev, rating }))}
-                  >
-                    <Text style={[
-                      styles.ratingButtonText,
-                      filterOptions.rating === rating && styles.activeRatingButtonText
-                    ]}>
-                      {rating === 0 ? 'Tümü' : `${rating}+ ⭐`}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Sort By */}
-            <View style={styles.filterSection}>
-              <Text style={styles.filterSectionTitle}>Sıralama</Text>
-              <View style={styles.filterChipsContainer}>
-                {filterOptions_list.map((option) => (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      styles.filterModalChip,
-                      filterOptions.sortBy === option && styles.activeFilterModalChip
-                    ]}
-                    onPress={() => setFilterOptions(prev => ({ ...prev, sortBy: option }))}
-                  >
-                    <Text style={[
-                      styles.filterModalChipText,
-                      filterOptions.sortBy === option && styles.activeFilterModalChipText
-                    ]}>
-                      {option}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          </ScrollView>
-
-          <View style={styles.modalFooter}>
-            <TouchableOpacity 
-              style={[styles.resetButton, !hasActiveFilters() && styles.disabledButton]} 
-              onPress={handleResetFilters}
-              disabled={!hasActiveFilters()}
-            >
-              <Text style={[styles.resetButtonText, !hasActiveFilters() && styles.disabledButtonText]}>
-                Sıfırla
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
-              <Text style={styles.applyButtonText}>Uygula</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
 
   const filteredTrips = getFilteredTrips();
 
@@ -440,7 +295,11 @@ export default function PastTripsScreen({ onBack, onTripPress }: PastTripsScreen
         keyExtractor={(item) => item.id.toString()}
       />
 
-      {renderFilterModal()}
+      <FilterModal
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onApplyFilter={handleApplyFilters}
+      />
     </SafeAreaView>
   );
 }
@@ -635,125 +494,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    width: '100%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  modalScrollView: {
-    marginBottom: 20,
-  },
-  filterSection: {
-    marginBottom: 20,
-  },
-  filterSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-  },
-  filterChipsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  filterModalChip: {
-    backgroundColor: 'transparent',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  activeFilterModalChip: {
-    backgroundColor: '#333',
-    borderColor: '#333',
-  },
-  filterModalChipText: {
-    fontSize: 16,
-    color: '#999',
-    fontWeight: '400',
-  },
-  activeFilterModalChipText: {
-    color: 'white',
-    fontWeight: '600',
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  resetButton: {
-    backgroundColor: '#333',
-    padding: 16,
-    borderRadius: 20,
-    flex: 1,
-    marginRight: 10,
-  },
-  resetButtonText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  applyButton: {
-    backgroundColor: '#FF6B35',
-    padding: 16,
-    borderRadius: 20,
-    flex: 1,
-  },
-  applyButtonText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingButton: {
-    backgroundColor: 'transparent',
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  activeRatingButton: {
-    backgroundColor: '#333',
-  },
-  ratingButtonText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
-  activeRatingButtonText: {
-    color: 'white',
-  },
-  disabledButton: {
-    backgroundColor: '#999',
-  },
-  disabledButtonText: {
-    color: '#666',
-  },
+
 }); 

@@ -16,9 +16,11 @@ interface CompanyDetailScreenProps {
   onTripPress?: (tripId: number, isPast: boolean) => void;
   onBookmarkTrip?: (trip: any) => void;
   isTripSaved?: (tripId: number) => boolean;
+  onContactPress?: () => void;
+  onBusInfoPress?: () => void;
 }
 
-export default function CompanyDetailScreen({ onBack, companyName, onTripPress, onBookmarkTrip, isTripSaved }: CompanyDetailScreenProps) {
+export default function CompanyDetailScreen({ onBack, companyName, onTripPress, onBookmarkTrip, isTripSaved, onContactPress, onBusInfoPress }: CompanyDetailScreenProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [selectedRatingFilter, setSelectedRatingFilter] = useState<string | null>(null);
 
@@ -232,12 +234,12 @@ export default function CompanyDetailScreen({ onBack, companyName, onTripPress, 
           
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.contactButton}>
+            <TouchableOpacity style={styles.contactButton} onPress={onContactPress}>
               <Ionicons name="chatbubble-outline" size={8} color="#FFFFFF" />
               <Text style={styles.contactButtonText}>İletişime Geç</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.busInfoButton}>
+            <TouchableOpacity style={styles.busInfoButton} onPress={onBusInfoPress}>
               <Ionicons name="bus-outline" size={8} color="#FFFFFF" />
               <Text style={styles.busInfoButtonText}>Otobüs Bilgileri</Text>
             </TouchableOpacity>
